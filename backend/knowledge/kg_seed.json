@@ -1,0 +1,16 @@
+{
+  "diseases": [
+    {"code": "diabetes_type2", "name": "2型糖尿病"},
+    {"code": "hypertension", "name": "高血压"},
+    {"code": "hyperlipidemia", "name": "高血脂"},
+    {"code": "copd", "name": "慢阻肺"}
+  ],
+  "guidelines": [
+    {
+      "source": "中国2型糖尿病防治指南",
+      "disease": "diabetes_type2",
+      "title": "血糖控制目标",
+      "content": "2型糖尿病患者空腹血糖控制目标一般为4.4-7.0 mmol/L"
+    }
+  ]
+}
