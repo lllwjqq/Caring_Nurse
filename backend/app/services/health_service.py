@@ -72,3 +72,17 @@ class HealthService:
             .limit(limit)
         )
         return list(result.scalars().all())
+
+    async def delete_record(self, patient: Patient, record_id: int) -> bool:
+        result = await self.db.execute(
+            select(HealthRecord).where(
+                HealthRecord.id == record_id,
+                HealthRecord.patient_id == patient.id,
+            )
+        )
+        record = result.scalar_one_or_none()
+        if not record:
+            return False
+        await self.db.delete(record)
+        await self.db.flush()
+        return True

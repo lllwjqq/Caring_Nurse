@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReactECharts from 'echarts-for-react'
 import { healthApi } from '../api/client'
+import { formatRecordLabel, formatRecordValue, type HealthRecordItem } from '../constants/healthRecords'
 
 const riskColors: Record<string, string> = {
   green: 'bg-safe',
@@ -62,7 +63,7 @@ export default function DashboardPage() {
     ],
   }
 
-  const todayRecords = (data.today_records as Array<Record<string, unknown>>) || []
+  const todayRecords = (data.today_records as HealthRecordItem[]) || []
   const recentAlerts = (data.recent_alerts as Array<Record<string, unknown>>) || []
 
   return (
@@ -119,9 +120,9 @@ export default function DashboardPage() {
           <div className="space-y-2">
             {todayRecords.map((r, i) => (
               <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-600">{r.record_type as string}</span>
+                <span className="text-sm text-gray-600">{formatRecordLabel(r)}</span>
                 <span className={`font-medium ${r.is_abnormal ? 'text-danger' : ''}`}>
-                  {r.value as number}{r.unit as string}
+                  {formatRecordValue(r)}
                 </span>
               </div>
             ))}

@@ -97,6 +97,19 @@ class HealthRecordResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class RecordFeedback(BaseModel):
+    is_abnormal: bool
+    alert_level: str | None
+    reference_range: str | None
+    message: str
+    alert_id: int | None = None
+
+
+class HealthRecordCreateResult(BaseModel):
+    record: HealthRecordResponse
+    feedback: RecordFeedback
+
+
 # Lifestyle
 class LifestyleLogCreate(BaseModel):
     log_type: LifestyleType
@@ -204,6 +217,23 @@ class AgentTraceResponse(BaseModel):
     input_data: dict | None
     output_data: dict | None
     duration_ms: int | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# 会话（短时记忆）
+class ChatSessionSummary(BaseModel):
+    session_id: str
+    title: str
+    message_count: int
+    last_message_at: datetime
+
+
+class ChatMessageResponse(BaseModel):
+    id: int
+    role: str
+    content: str
     created_at: datetime
 
     model_config = {"from_attributes": True}

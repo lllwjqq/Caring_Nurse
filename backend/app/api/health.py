@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,17 +11,24 @@ from app.models import Alert, AlertLevel, CarePlan, FollowUp, HealthRecord, Life
 from app.schemas import (
     DashboardStats,
     HealthRecordCreate,
+    HealthRecordCreateResult,
     HealthRecordResponse,
     LifestyleLogCreate,
     LifestyleLogResponse,
+    RecordFeedback,
 )
-from app.services.alert_service import AlertService
+from app.services.alert_service import (
+    AlertService,
+    build_feedback_message,
+    get_metric_key,
+    get_reference_range,
+)
 from app.services.health_service import HealthService
 
 router = APIRouter(prefix="/health", tags=["健康数据"])
 
 
-@router.post("/records", response_model=HealthRecordResponse)
+@router.post("/records", response_model=HealthRecordCreateResult)
 async def create_health_record(
     data: HealthRecordCreate,
     user: User = Depends(get_current_user),
@@ -31,8 +38,27 @@ async def create_health_record(
     service = HealthService(db)
     record = await service.create_record(patient, data)
     alert_service = AlertService(db)
-    await alert_service.evaluate_record(patient, record)
-    return record
+    alert = await alert_service.evaluate_record(patient, record)
+
+    metric_key = get_metric_key(record.record_type.value, record.extra_data)
+    reference_range = get_reference_range(record.record_type.value, metric_key)
+    alert_level = alert.level.value if alert else ("yellow" if record.is_abnormal else "green")
+    if not record.is_abnormal and not alert:
+        alert_level = "green"
+
+    feedback = RecordFeedback(
+        is_abnormal=record.is_abnormal or alert is not None,
+        alert_level=alert_level,
+        reference_range=reference_range,
+        message=build_feedback_message(
+            record.record_type.value,
+            alert.level if alert else None,
+            record.extra_data,
+            record.is_abnormal or alert is not None,
+        ),
+        alert_id=alert.id if alert else None,
+    )
+    return HealthRecordCreateResult(record=record, feedback=feedback)
 
 
 @router.get("/records", response_model=list[HealthRecordResponse])
@@ -53,6 +79,20 @@ async def list_health_records(
         query = query.where(HealthRecord.record_type == record_type)
     result = await db.execute(query)
     return result.scalars().all()
+
+
+@router.delete("/records/{record_id}")
+async def delete_health_record(
+    record_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    service = HealthService(db)
+    deleted = await service.delete_record(patient, record_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="记录不存在")
+    return {"ok": True}
 
 
 @router.post("/lifestyle", response_model=LifestyleLogResponse)

@@ -9,11 +9,74 @@ from app.services.redis_client import redis_client
 DEFAULT_THRESHOLDS = [
     {"disease": "diabetes_type2", "record_type": "blood_glucose", "yellow_max": 7.0, "orange_max": 11.1, "red_max": 16.7, "unit": "mmol/L"},
     {"disease": "diabetes_type2", "record_type": "blood_glucose", "metric_key": "fasting", "yellow_max": 7.0, "orange_max": 10.0, "red_max": 13.9, "unit": "mmol/L"},
+    {"disease": "diabetes_type2", "record_type": "blood_glucose", "metric_key": "postprandial", "yellow_max": 10.0, "orange_max": 13.9, "red_max": 16.7, "unit": "mmol/L"},
+    {"disease": "diabetes_type2", "record_type": "blood_glucose", "metric_key": "random", "yellow_max": 11.1, "orange_max": 13.9, "red_max": 16.7, "unit": "mmol/L"},
+    {"disease": "diabetes_type2", "record_type": "blood_glucose", "metric_key": "bedtime", "yellow_max": 8.0, "orange_max": 10.0, "red_max": 13.9, "unit": "mmol/L"},
     {"disease": "hypertension", "record_type": "blood_pressure", "metric_key": "systolic", "yellow_max": 140, "orange_max": 160, "red_max": 180, "unit": "mmHg"},
     {"disease": "hypertension", "record_type": "blood_pressure", "metric_key": "diastolic", "yellow_max": 90, "orange_max": 100, "red_max": 110, "unit": "mmHg"},
     {"disease": "hyperlipidemia", "record_type": "blood_lipid", "metric_key": "ldl", "yellow_max": 3.4, "orange_max": 4.1, "red_max": 4.9, "unit": "mmol/L"},
     {"disease": "copd", "record_type": "spo2", "yellow_min": 94, "orange_min": 90, "red_min": 85, "unit": "%"},
 ]
+
+REFERENCE_RANGES: dict[tuple[str, str], str] = {
+    ("blood_glucose", "value"): "4.4-7.0 mmol/L",
+    ("blood_glucose", "fasting"): "4.4-7.0 mmol/L",
+    ("blood_glucose", "postprandial"): "<10.0 mmol/L",
+    ("blood_glucose", "random"): "<11.1 mmol/L",
+    ("blood_glucose", "bedtime"): "4.4-8.0 mmol/L",
+    ("blood_pressure", "systolic"): "90-140 mmHg",
+    ("blood_pressure", "diastolic"): "60-90 mmHg",
+    ("weight", "value"): "因个人而异",
+    ("blood_lipid", "value"): "LDL-C <3.4 mmol/L",
+    ("spo2", "value"): "≥94%",
+}
+
+RECORD_TYPE_LABELS = {
+    "blood_glucose": "血糖",
+    "blood_pressure": "血压",
+    "weight": "体重",
+    "blood_lipid": "血脂",
+    "spo2": "血氧",
+    "heart_rate": "心率",
+}
+
+GLUCOSE_CONTEXT_LABELS = {
+    "fasting": "空腹",
+    "postprandial": "餐后2h",
+    "random": "随机",
+    "bedtime": "睡前",
+}
+
+
+def get_reference_range(record_type: str, metric_key: str = "value") -> str | None:
+    return REFERENCE_RANGES.get((record_type, metric_key)) or REFERENCE_RANGES.get((record_type, "value"))
+
+
+def get_metric_key(record_type: str, extra_data: dict | None) -> str:
+    if record_type == "blood_pressure":
+        return "systolic"
+    if extra_data and "type" in extra_data:
+        return extra_data.get("type", "value")
+    return "value"
+
+
+def build_feedback_message(
+    record_type: str, level: AlertLevel | None, extra_data: dict | None, is_abnormal: bool
+) -> str:
+    label = RECORD_TYPE_LABELS.get(record_type, record_type)
+    if record_type == "blood_glucose" and extra_data and extra_data.get("type"):
+        ctx = GLUCOSE_CONTEXT_LABELS.get(extra_data["type"], "")
+        if ctx:
+            label = f"{ctx}{label}"
+    if not is_abnormal and not level:
+        return f"{label}在正常范围内，请继续保持。"
+    if level == AlertLevel.red:
+        return f"{label}严重异常，请立即就医。"
+    if level == AlertLevel.orange:
+        return f"{label}异常，建议尽快联系医生。"
+    if level == AlertLevel.yellow:
+        return f"{label}偏高，请关注并继续监测。"
+    return f"{label}已记录。"
 
 
 class AlertService:
@@ -53,11 +116,15 @@ class AlertService:
         else:
             thresholds_data = thresholds
 
+        has_typed_context = bool(extra_data and "type" in extra_data)
         level = None
         for th in thresholds_data:
             td = th if isinstance(th, AlertThreshold) else th
             mk = td.metric_key if hasattr(td, "metric_key") else td.get("metric_key", "value")
-            if mk != metric_key and mk != "value":
+            if has_typed_context:
+                if mk != metric_key:
+                    continue
+            elif mk != metric_key and mk != "value":
                 continue
             cv = check_value
             red_max = getattr(td, "red_max", None) or (td.get("red_max") if isinstance(td, dict) else None)

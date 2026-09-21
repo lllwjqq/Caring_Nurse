@@ -2,21 +2,42 @@ import time
 import uuid
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import AgentTrace, CarePlan, FollowUp, Patient
+from app.config import settings
+from app.models import AgentTrace, CarePlan, ChatMessage, FollowUp, Patient
 from app.services.health_service import HealthService
 from app.services.llm_service import llm_service
 from app.services.rag_service import RAGService
 from app.services.redis_client import redis_client
 
+HISTORY_LIMIT = 10
+
+
+async def load_history(db: AsyncSession, patient_id: int, session_id: str, limit: int = HISTORY_LIMIT) -> list[dict]:
+    result = await db.execute(
+        select(ChatMessage)
+        .where(ChatMessage.patient_id == patient_id, ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.created_at.desc())
+        .limit(limit)
+    )
+    rows = list(result.scalars().all())
+    return [{"role": r.role, "content": r.content} for r in reversed(rows)]
+
+
+async def save_message(db: AsyncSession, patient_id: int, session_id: str, role: str, content: str):
+    db.add(ChatMessage(patient_id=patient_id, session_id=session_id, role=role, content=content))
+    await db.flush()
+
 
 class AgentContext:
-    def __init__(self, db: AsyncSession, patient: Patient, session_id: str):
+    def __init__(self, db: AsyncSession, patient: Patient, session_id: str, history: list[dict] | None = None):
         self.db = db
         self.patient = patient
         self.session_id = session_id
         self.traces: list[dict] = []
+        self.history = history or []
 
     async def log_trace(self, agent_name: str, action: str, input_data: dict, output_data: dict, start: float):
         duration = int((time.time() - start) * 1000)
@@ -56,12 +77,13 @@ async def router_agent(ctx: AgentContext, message: str) -> str:
     return intent
 
 
-async def consult_agent(ctx: AgentContext, message: str) -> str:
-    start = time.time()
-    rag = RAGService(ctx.db)
-    disease = ctx.patient.diseases[0] if ctx.patient.diseases else None
-    chunks = await rag.search(message, disease=disease)
-    context = rag.format_context(chunks)
+async def build_consult_messages(ctx: AgentContext, message: str) -> list[dict]:
+    context = ""
+    if settings.enable_rag:
+        rag = RAGService(ctx.db)
+        disease = ctx.patient.diseases[0] if ctx.patient.diseases else None
+        chunks = await rag.search(message, disease=disease)
+        context = rag.format_context(chunks)
 
     health_svc = HealthService(ctx.db)
     recent = await health_svc.get_recent_records(ctx.patient.id, 5)
@@ -70,19 +92,22 @@ async def consult_agent(ctx: AgentContext, message: str) -> str:
         for r in recent
     ) or "暂无近期记录"
 
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "你是「贴心小护士」的问诊助手，专注于慢病健康管理。"
-                "用温和、口语化的中文回答，不做诊断，只提供健康管理建议。"
-                f"\n患者慢病：{', '.join(ctx.patient.diseases or ['未指定'])}"
-                f"\n近期指标：\n{records_text}"
-                f"\n\n参考知识：\n{context}"
-            ),
-        },
-        {"role": "user", "content": message},
-    ]
+    system = (
+        "你是「贴心小护士」的问诊助手，专注于慢病健康管理。"
+        "用温和、口语化的中文回答，不做诊断，只提供健康管理建议。"
+        f"\n患者慢病：{', '.join(ctx.patient.diseases or ['未指定'])}"
+        f"\n近期指标：\n{records_text}"
+        f"\n\n参考知识：\n{context}"
+    )
+    messages = [{"role": "system", "content": system}]
+    messages.extend(ctx.history)
+    messages.append({"role": "user", "content": message})
+    return messages
+
+
+async def consult_agent(ctx: AgentContext, message: str) -> str:
+    start = time.time()
+    messages = await build_consult_messages(ctx, message)
     reply = await llm_service.chat(messages)
     await ctx.log_trace("consult", "symptom_consultation", {"message": message}, {"reply": reply[:300]}, start)
     return reply
@@ -107,34 +132,33 @@ async def monitor_agent(ctx: AgentContext, message: str) -> str:
     return f"已分析您最近 {len(recent)} 条健康记录，目前指标整体正常，请继续保持规律监测。"
 
 
-async def planner_agent(ctx: AgentContext, message: str) -> dict:
-    start = time.time()
-    rag = RAGService(ctx.db)
-    disease = ctx.patient.diseases[0] if ctx.patient.diseases else "general"
-    chunks = await rag.search(f"饮食运动方案 {disease}", disease=disease)
-    context = rag.format_context(chunks)
+async def build_planner_messages(ctx: AgentContext, message: str) -> list[dict]:
+    context = ""
+    if settings.enable_rag:
+        rag = RAGService(ctx.db)
+        disease = ctx.patient.diseases[0] if ctx.patient.diseases else "general"
+        chunks = await rag.search(f"饮食运动方案 {disease}", disease=disease)
+        context = rag.format_context(chunks)
 
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "根据患者信息和指南知识，生成个性化慢病管理方案。"
-                "以JSON格式回复，包含 diet_plan, exercise_plan, monitoring_plan 三个字段，每个字段为具体建议列表。"
-                f"\n患者信息：慢病={ctx.patient.diseases}, 身高={ctx.patient.height_cm}, 体重={ctx.patient.weight_kg}"
-                f"\n参考知识：\n{context}"
-            ),
-        },
-        {"role": "user", "content": message or "请为我制定慢病管理方案"},
-    ]
-    reply = await llm_service.chat(messages)
+    system = (
+        "根据患者信息和指南知识，生成个性化慢病管理方案。"
+        "以JSON格式回复，包含 diet_plan, exercise_plan, monitoring_plan 三个字段，每个字段为具体建议列表。"
+        f"\n患者信息：慢病={ctx.patient.diseases}, 身高={ctx.patient.height_cm}, 体重={ctx.patient.weight_kg}"
+        f"\n参考知识：\n{context}"
+    )
+    messages = [{"role": "system", "content": system}]
+    messages.extend(ctx.history)
+    messages.append({"role": "user", "content": message or "请为我制定慢病管理方案"})
+    return messages
 
+
+async def create_care_plan(ctx: AgentContext, message: str, reply: str) -> dict:
     plan_data = {
         "diet_plan": {"items": ["低盐低脂饮食", "每日蔬菜500g", "控制精制碳水摄入", "少食多餐"]},
         "exercise_plan": {"items": ["每周150分钟中等强度有氧运动", "每日散步30分钟", "避免剧烈运动"]},
         "monitoring_plan": {"items": ["每日监测血压", "每周监测血糖3次", "每月体重记录"]},
         "ai_notes": reply,
     }
-
     care_plan = CarePlan(
         patient_id=ctx.patient.id,
         title="个性化慢病管理方案",
@@ -147,6 +171,14 @@ async def planner_agent(ctx: AgentContext, message: str) -> dict:
     ctx.db.add(care_plan)
     await ctx.db.flush()
     plan_data["plan_id"] = care_plan.id
+    return plan_data
+
+
+async def planner_agent(ctx: AgentContext, message: str) -> dict:
+    start = time.time()
+    messages = await build_planner_messages(ctx, message)
+    reply = await llm_service.chat(messages)
+    plan_data = await create_care_plan(ctx, message, reply)
     await ctx.log_trace("planner", "create_care_plan", {"message": message}, plan_data, start)
     return plan_data
 
@@ -187,7 +219,10 @@ async def warning_agent(ctx: AgentContext, message: str) -> str:
 
 async def run_agent_graph(db: AsyncSession, patient: Patient, message: str, session_id: str | None = None) -> dict[str, Any]:
     session_id = session_id or str(uuid.uuid4())
-    ctx = AgentContext(db, patient, session_id)
+    history = await load_history(db, patient.id, session_id)
+    ctx = AgentContext(db, patient, session_id, history=history)
+
+    await save_message(db, patient.id, session_id, "user", message)
 
     intent = await router_agent(ctx, message)
     reply = ""
@@ -210,6 +245,8 @@ async def run_agent_graph(db: AsyncSession, patient: Patient, message: str, sess
         reply = await warning_agent(ctx, message)
     else:
         reply = await consult_agent(ctx, message)
+
+    await save_message(db, patient.id, session_id, "assistant", reply)
 
     await redis_client.set_patient_context(patient.id, {
         "session_id": session_id,

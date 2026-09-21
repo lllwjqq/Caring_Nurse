@@ -10,8 +10,15 @@ from app.api.patients import get_patient_for_user
 from app.auth import get_current_user
 from app.database import get_db
 from app.graph.langgraph_app import run_langgraph as run_agent_graph
-from app.models import AgentTrace, User
-from app.schemas import AgentTraceResponse, ChatRequest, ChatResponse
+from app.graph.streaming import stream_agent_graph
+from app.models import AgentTrace, ChatMessage, User
+from app.schemas import (
+    AgentTraceResponse,
+    ChatMessageResponse,
+    ChatRequest,
+    ChatResponse,
+    ChatSessionSummary,
+)
 from app.services.llm_service import llm_service
 from app.services.rag_service import RAGService
 
@@ -43,14 +50,8 @@ async def chat_stream(
     patient = await get_patient_for_user(user, db)
 
     async def event_generator():
-        result = await run_agent_graph(db, patient, data.message, data.session_id)
-        for trace in result["agent_traces"]:
-            yield f"data: {json.dumps({'type': 'trace', 'data': trace}, ensure_ascii=False)}\n\n"
-        reply = result["reply"]
-        for i in range(0, len(reply), 30):
-            chunk = reply[i : i + 30]
-            yield f"data: {json.dumps({'type': 'token', 'data': chunk}, ensure_ascii=False)}\n\n"
-        yield f"data: {json.dumps({'type': 'done', 'session_id': result['session_id'], 'care_plan': result.get('care_plan')}, ensure_ascii=False)}\n\n"
+        async for event in stream_agent_graph(db, patient, data.message, data.session_id):
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -66,5 +67,50 @@ async def get_traces(
         select(AgentTrace)
         .where(AgentTrace.session_id == session_id, AgentTrace.patient_id == patient.id)
         .order_by(AgentTrace.created_at)
+    )
+    return result.scalars().all()
+
+
+@router.get("/sessions", response_model=list[ChatSessionSummary])
+async def list_sessions(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """列出当前患者的全部历史会话（短时记忆），按最近活跃倒序。"""
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(ChatMessage)
+        .where(ChatMessage.patient_id == patient.id)
+        .order_by(ChatMessage.created_at)
+    )
+    messages = result.scalars().all()
+
+    grouped: dict[str, dict] = {}
+    for m in messages:
+        s = grouped.setdefault(
+            m.session_id,
+            {"session_id": m.session_id, "title": "", "message_count": 0, "last_message_at": m.created_at},
+        )
+        s["message_count"] += 1
+        s["last_message_at"] = m.created_at
+        if not s["title"] and m.role == "user":
+            s["title"] = (m.content or "").strip()[:30] or "新对话"
+
+    summaries = sorted(grouped.values(), key=lambda x: x["last_message_at"], reverse=True)
+    return [ChatSessionSummary(**s) for s in summaries]
+
+
+@router.get("/sessions/{session_id}/messages", response_model=list[ChatMessageResponse])
+async def get_session_messages(
+    session_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """恢复某个会话的完整消息历史（按时间正序）。"""
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(ChatMessage)
+        .where(ChatMessage.patient_id == patient.id, ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.created_at)
     )
     return result.scalars().all()

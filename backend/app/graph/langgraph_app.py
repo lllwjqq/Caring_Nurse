@@ -1,5 +1,4 @@
 """LangGraph 多智能体状态图编排"""
-import time
 import uuid
 from typing import Any, TypedDict
 
@@ -10,9 +9,11 @@ from app.graph.orchestrator import (
     AgentContext,
     consult_agent,
     followup_agent,
+    load_history,
     monitor_agent,
     planner_agent,
     router_agent,
+    save_message,
     warning_agent,
 )
 from app.models import Patient
@@ -26,6 +27,7 @@ class GraphState(TypedDict, total=False):
     reply: str
     session_id: str
     patient_id: int
+    history: list[dict]
     traces: list[dict]
     care_plan: dict | None
     followup: dict | None
@@ -33,16 +35,19 @@ class GraphState(TypedDict, total=False):
     patient: Any
 
 
+def _make_ctx(state: GraphState) -> AgentContext:
+    return AgentContext(state["db"], state["patient"], state["session_id"], history=state.get("history", []))
+
+
 async def _router_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
-    intent = await router_agent(ctx, state["message"])
-    state["intent"] = intent
+    ctx = _make_ctx(state)
+    state["intent"] = await router_agent(ctx, state["message"])
     state["traces"] = ctx.traces
     return state
 
 
 async def _consult_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["reply"] = await consult_agent(ctx, state["message"])
     state["traces"] = ctx.traces
@@ -50,7 +55,7 @@ async def _consult_node(state: GraphState) -> GraphState:
 
 
 async def _monitor_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["reply"] = await monitor_agent(ctx, state["message"])
     state["traces"] = ctx.traces
@@ -58,7 +63,7 @@ async def _monitor_node(state: GraphState) -> GraphState:
 
 
 async def _planner_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["care_plan"] = await planner_agent(ctx, state["message"])
     state["reply"] = llm_service.DISCLAIMER + "\n\n已为您生成个性化管理方案，请查看「管理方案」页面。"
@@ -67,7 +72,7 @@ async def _planner_node(state: GraphState) -> GraphState:
 
 
 async def _followup_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["followup"] = await followup_agent(ctx, state["message"])
     state["reply"] = "已为您创建随访任务，请前往「随访任务」页面完成问卷。"
@@ -76,7 +81,7 @@ async def _followup_node(state: GraphState) -> GraphState:
 
 
 async def _warning_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["reply"] = await warning_agent(ctx, state["message"])
     state["traces"] = ctx.traces
@@ -84,7 +89,7 @@ async def _warning_node(state: GraphState) -> GraphState:
 
 
 async def _consult_with_plan_node(state: GraphState) -> GraphState:
-    ctx = AgentContext(state["db"], state["patient"], state["session_id"])
+    ctx = _make_ctx(state)
     ctx.traces = state.get("traces", [])
     state["reply"] = await consult_agent(ctx, state["message"])
     state["traces"] = ctx.traces
@@ -134,15 +139,20 @@ agent_graph = build_agent_graph()
 
 async def run_langgraph(db: AsyncSession, patient: Patient, message: str, session_id: str | None = None) -> dict[str, Any]:
     session_id = session_id or str(uuid.uuid4())
+    history = await load_history(db, patient.id, session_id)
     initial: GraphState = {
         "message": message,
         "session_id": session_id,
         "patient_id": patient.id,
+        "history": history,
         "traces": [],
         "db": db,
         "patient": patient,
     }
+    await save_message(db, patient.id, session_id, "user", message)
     result = await agent_graph.ainvoke(initial)
+    reply = result.get("reply", "")
+    await save_message(db, patient.id, session_id, "assistant", reply)
 
     await redis_client.set_patient_context(patient.id, {
         "session_id": session_id,
@@ -151,7 +161,7 @@ async def run_langgraph(db: AsyncSession, patient: Patient, message: str, sessio
     })
 
     return {
-        "reply": result.get("reply", ""),
+        "reply": reply,
         "session_id": session_id,
         "agent_traces": result.get("traces", []),
         "care_plan": result.get("care_plan"),
