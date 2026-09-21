@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     llm_model: str = "deepseek-chat"
     llm_embedding_model: str = "text-embedding-3-small"
 
+    # 是否启用 RAG 知识检索（调试记忆功能时可暂时关闭）
+    enable_rag: bool = True
+
+    # 讯飞开放平台语音（语音听写 ASR + 语音合成 TTS）
+    iflytek_appid: str = ""
+    iflytek_api_key: str = ""
+    iflytek_api_secret: str = ""
+    iflytek_tts_voice: str = "xiaoyan"
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

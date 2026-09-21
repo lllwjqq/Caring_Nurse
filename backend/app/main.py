@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api import agents, auth, features, health, knowledge, patients, websocket
+from app.api import agents, auth, features, health, knowledge, patients, voice, websocket
 from app.config import settings
 from app.database import Base, engine
 from app.services.redis_client import redis_client
@@ -44,6 +44,7 @@ app.include_router(health.router, prefix="/api")
 app.include_router(features.router, prefix="/api")
 app.include_router(agents.router, prefix="/api")
 app.include_router(knowledge.router, prefix="/api")
+app.include_router(voice.router, prefix="/api")
 app.include_router(websocket.router, prefix="/api")
 
 
