@@ -1,5 +1,7 @@
 """服药提醒服务：频次展开、CRUD、到期查询。"""
 
+from __future__ import annotations
+
 from datetime import date
 
 from sqlalchemy import select
