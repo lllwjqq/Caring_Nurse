@@ -1,7 +1,7 @@
 import io
 import uuid
 
-from fastapi import APIRouter, Depends, File, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,11 +12,14 @@ from app.models import Alert, CarePlan, FollowUp, MedicalDocument, User
 from app.schemas import (
     AlertResponse,
     CarePlanResponse,
+    DocumentConfirmRequest,
+    DocumentConfirmResponse,
     FollowUpResponse,
     FollowUpSubmit,
     MedicalDocumentResponse,
 )
 from app.services.alert_service import AlertService
+from app.services.document_processing import DocumentService
 from app.services.storage_service import StorageService
 
 router = APIRouter(tags=["业务功能"])
@@ -120,15 +123,18 @@ async def upload_document(
     content = await file.read()
     file_path = await storage.upload(file.filename or "report.pdf", io.BytesIO(content))
 
-    ocr_text, parsed = await storage.process_document(content, file.filename or "")
+    service = DocumentService()
+    ocr_text, parsed = await service.process(content, file.filename or "")
 
     doc = MedicalDocument(
         patient_id=patient.id,
         filename=file.filename or "unknown",
         file_path=file_path,
+        doc_type=parsed.get("doc_type", "unknown"),
+        confidence=parsed.get("confidence"),
         ocr_text=ocr_text,
         parsed_data=parsed,
-        status="processed",
+        status="awaiting_confirmation",
     )
     db.add(doc)
     await db.flush()
@@ -142,3 +148,78 @@ async def list_documents(user: User = Depends(get_current_user), db: AsyncSessio
         select(MedicalDocument).where(MedicalDocument.patient_id == patient.id).order_by(MedicalDocument.created_at.desc())
     )
     return result.scalars().all()
+
+
+@router.get("/documents/{document_id}", response_model=MedicalDocumentResponse)
+async def get_document(
+    document_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(MedicalDocument).where(
+            MedicalDocument.id == document_id,
+            MedicalDocument.patient_id == patient.id,
+        )
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(404, "文档不存在")
+    return doc
+
+
+@router.post("/documents/{document_id}/confirm", response_model=DocumentConfirmResponse)
+async def confirm_document(
+    document_id: int,
+    data: DocumentConfirmRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(MedicalDocument).where(
+            MedicalDocument.id == document_id,
+            MedicalDocument.patient_id == patient.id,
+        )
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(404, "文档不存在")
+    if doc.status == "confirmed":
+        raise HTTPException(400, "该文档已确认")
+
+    # 以用户在前端确认/编辑后的字段为准
+    entities = dict(doc.parsed_data or {})
+    if data.metrics is not None:
+        entities["metrics"] = data.metrics
+    if data.exam_date is not None:
+        entities["exam_date"] = data.exam_date
+
+    service = DocumentService()
+    actions = await service.dispatch(db, patient, doc.doc_type, entities)
+    doc.parsed_data = entities
+    doc.status = "confirmed"
+    await db.flush()
+    return DocumentConfirmResponse(document_id=doc.id, status=doc.status, actions=actions)
+
+
+@router.post("/documents/{document_id}/reject")
+async def reject_document(
+    document_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(MedicalDocument).where(
+            MedicalDocument.id == document_id,
+            MedicalDocument.patient_id == patient.id,
+        )
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(404, "文档不存在")
+    doc.status = "discarded"
+    await db.flush()
+    return {"document_id": doc.id, "status": doc.status}

@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     iflytek_api_secret: str = ""
     iflytek_tts_voice: str = "xiaoyan"
 
+    # OCR 文档识别（本地 OCR 引擎 + LLM 结构化抽取）
+    # rapidocr：本地轻量 OCR（onnxruntime，无 GPU 依赖），未安装时自动回退 mock
+    ocr_engine: str = "rapidocr"  # rapidocr | paddleocr | mock
+    ocr_lang: str = "ch"
+    ocr_use_llm_extract: bool = True
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

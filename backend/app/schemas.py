@@ -187,12 +187,31 @@ class MedicalDocumentResponse(BaseModel):
     patient_id: int
     filename: str
     doc_type: str
+    confidence: float | None
     ocr_text: str | None
     parsed_data: dict | None
     status: str
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class DocumentConfirmRequest(BaseModel):
+    metrics: list[dict[str, Any]] | None = None
+    exam_date: str | None = None
+
+
+class DocumentAction(BaseModel):
+    type: str
+    record_id: int | None = None
+    reminder_id: int | None = None
+    summary: str
+
+
+class DocumentConfirmResponse(BaseModel):
+    document_id: int
+    status: str
+    actions: list[DocumentAction]
 
 
 # Agent

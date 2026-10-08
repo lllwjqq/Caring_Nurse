@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 from typing import AsyncGenerator
 
 import httpx
@@ -55,6 +56,43 @@ class LLMService:
                         delta = data["choices"][0].get("delta", {}).get("content", "")
                         if delta:
                             yield delta
+
+    async def extract_json(self, system: str, user: str) -> dict | None:
+        """调用 LLM 做结构化抽取，返回解析后的 JSON dict；失败/不可用时返回 None。
+
+        供 OCR 文档解析使用：系统提示词要求只输出 JSON，此处做鲁棒解析。
+        """
+        if not self.is_available:
+            return None
+        text = await self.chat(
+            [{"role": "system", "content": system}, {"role": "user", "content": user}],
+            temperature=0.0,
+        )
+        if not text:
+            return None
+        return self._parse_json(text)
+
+    @staticmethod
+    def _parse_json(text: str) -> dict | None:
+        text = text.strip()
+        # 去掉 ```json ... ``` 代码围栏
+        fence = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL)
+        if fence:
+            text = fence.group(1).strip()
+        try:
+            obj = json.loads(text)
+            return obj if isinstance(obj, dict) else None
+        except Exception:
+            pass
+        # 兜底：截取第一个 { 到最后一个 }
+        start, end = text.find("{"), text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            try:
+                obj = json.loads(text[start : end + 1])
+                return obj if isinstance(obj, dict) else None
+            except Exception:
+                return None
+        return None
 
     async def embed(self, text: str) -> list[float]:
         if not self.is_available:

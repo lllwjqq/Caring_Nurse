@@ -61,6 +61,10 @@ export const featureApi = {
     return api.post('/documents/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
   listDocuments: () => api.get('/documents'),
+  getDocument: (id: number) => api.get(`/documents/${id}`),
+  confirmDocument: (id: number, data?: { metrics?: unknown[]; exam_date?: string }) =>
+    api.post(`/documents/${id}/confirm`, data ?? {}),
+  rejectDocument: (id: number) => api.post(`/documents/${id}/reject`),
 }
 
 export const agentApi = {

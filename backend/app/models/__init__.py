@@ -190,10 +190,11 @@ class MedicalDocument(Base):
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
     filename: Mapped[str] = mapped_column(String(255))
     file_path: Mapped[str] = mapped_column(String(500))
-    doc_type: Mapped[str] = mapped_column(String(50), default="report")
+    doc_type: Mapped[str] = mapped_column(String(50), default="unknown")
+    confidence: Mapped[float | None] = mapped_column(Float)
     ocr_text: Mapped[str | None] = mapped_column(Text)
     parsed_data: Mapped[dict | None] = mapped_column(JSONB, default=dict)
-    status: Mapped[str] = mapped_column(String(20), default="pending")
+    status: Mapped[str] = mapped_column(String(20), default="uploaded")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     patient: Mapped["Patient"] = relationship(back_populates="medical_documents")
