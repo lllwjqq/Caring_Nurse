@@ -5,6 +5,7 @@ const navItems = [
   { to: '/records', label: '录入', icon: '📝' },
   { to: '/chat', label: '问诊', icon: '💬' },
   { to: '/alerts', label: '预警', icon: '🔔' },
+  { to: '/reminders', label: '用药', icon: '💊' },
   { to: '/profile', label: '我的', icon: '👤' },
 ]
 

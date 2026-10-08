@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field
@@ -199,6 +199,7 @@ class MedicalDocumentResponse(BaseModel):
 class DocumentConfirmRequest(BaseModel):
     metrics: list[dict[str, Any]] | None = None
     exam_date: str | None = None
+    medications: list[dict[str, Any]] | None = None
 
 
 class DocumentAction(BaseModel):
@@ -212,6 +213,60 @@ class DocumentConfirmResponse(BaseModel):
     document_id: int
     status: str
     actions: list[DocumentAction]
+
+
+# Medication Reminders
+class MedicationReminderCreate(BaseModel):
+    medication_name: str
+    brand_name: str | None = None
+    spec: str | None = None
+    dose: float | None = None
+    dose_unit: str | None = None
+    frequency: str = "qd"
+    times_of_day: list[str] | None = None
+    route: str | None = None
+    timing_note: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    notes: str | None = None
+
+
+class MedicationReminderUpdate(BaseModel):
+    medication_name: str | None = None
+    brand_name: str | None = None
+    spec: str | None = None
+    dose: float | None = None
+    dose_unit: str | None = None
+    frequency: str | None = None
+    times_of_day: list[str] | None = None
+    route: str | None = None
+    timing_note: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    notes: str | None = None
+    active: bool | None = None
+
+
+class MedicationReminderResponse(BaseModel):
+    id: int
+    patient_id: int
+    medication_name: str
+    brand_name: str | None
+    spec: str | None
+    dose: float | None
+    dose_unit: str | None
+    frequency: str
+    times_of_day: list | None
+    route: str | None
+    timing_note: str | None
+    start_date: date | None
+    end_date: date | None
+    notes: str | None
+    source_document_id: int | None
+    active: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 # Agent

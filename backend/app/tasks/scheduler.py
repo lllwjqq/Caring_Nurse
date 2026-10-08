@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 
+from app.config import settings
 from app.database import AsyncSessionLocal
-from app.models import FollowUp, Patient
+from app.models import Alert, AlertLevel, FollowUp, MedicationReminder, Patient
+from app.services.redis_client import redis_client
 
 
 async def create_followup_tasks():
@@ -31,4 +34,59 @@ async def create_followup_tasks():
                 due_at=datetime.now(timezone.utc) + timedelta(days=7),
             )
             db.add(followup)
+        await db.commit()
+
+
+async def dispatch_due_reminders():
+    """每分钟检查到点的服药提醒，生成服药通知（Alert + 实时推送）。"""
+    try:
+        tz = ZoneInfo(settings.app_timezone)
+    except Exception:
+        tz = None
+    now = datetime.now(tz)
+    hhmm = now.strftime("%H:%M")
+    today = now.date()
+
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            select(MedicationReminder).where(MedicationReminder.active.is_(True))
+        )
+        reminders = result.scalars().all()
+        for r in reminders:
+            if hhmm not in (r.times_of_day or []):
+                continue
+            if r.start_date and r.start_date > today:
+                continue
+            if r.end_date and r.end_date < today:
+                continue
+
+            # 用 redis SET NX 去重，防止同一分钟重复触发；redis 不可用时放行（宁可重复）
+            try:
+                fired = await redis_client.set_nx(f"reminder_fired:{r.id}:{today}:{hhmm}", "1", 90)
+            except Exception:
+                fired = True
+            if not fired:
+                continue
+
+            dose = f"{r.dose or ''}{r.dose_unit or ''}".strip()
+            message = f"请服用 {r.medication_name}" + (f" {dose}" if dose else "")
+            if r.timing_note:
+                message += f"（{r.timing_note}）"
+
+            db.add(Alert(
+                patient_id=r.patient_id,
+                level=AlertLevel.green,
+                title="服药提醒",
+                message=message,
+                source="medication",
+            ))
+            try:
+                await redis_client.publish_alert(r.patient_id, {
+                    "id": None,
+                    "level": "green",
+                    "title": "服药提醒",
+                    "message": message,
+                })
+            except Exception:
+                pass
         await db.commit()

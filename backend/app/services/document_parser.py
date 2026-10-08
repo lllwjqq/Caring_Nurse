@@ -48,6 +48,19 @@ EXTRACT_LAB_SYSTEM = (
     "无法确定的字段填 null，严禁编造数值。无有效指标时 metrics 为空数组。"
 )
 
+EXTRACT_PRESCRIPTION_SYSTEM = (
+    "你是处方结构化抽取助手。从 OCR 文本中提取处方用药信息，只输出 JSON，不要其他文字。\n"
+    "输出格式：\n"
+    '{"doc_type":"prescription","confidence":0.9,"hospital":"...或null","department":"...或null",'
+    '"doctor":"...或null","issue_date":"YYYY-MM-DD 或 null",'
+    '"medications":[{"name":"药名","generic_name":"通用名或null","spec":"规格或null",'
+    '"dose":1,"dose_unit":"片/mg/ml或null","frequency":"qd/bid/tid/qid/q8h/qn/prn",'
+    '"route":"口服/外用/吸入/含服或null","timing_note":"饭前/饭后/睡前/晨起或null",'
+    '"duration_days":7或null,"notes":"注意事项或null","confidence":0.9}]}\n'
+    "频次拉丁文缩写：qd=每日1次、bid=每日2次、tid=每日3次、qid=每日4次、q8h=每8小时、qn=睡前、prn=必要时。\n"
+    "无法确定的字段填 null，严禁编造。无有效药品时 medications 为空数组。"
+)
+
 # 正则回退模板：(pattern, record_type, unit, context)
 _LAB_PATTERNS = [
     (r"空腹血糖[：:]\s*([\d.]+)", "blood_glucose", "mmol/L", "fasting"),
@@ -88,10 +101,27 @@ def _classify_keywords(text: str) -> str:
 
 
 async def extract_structured(doc_type: str, text: str) -> dict:
-    """按 doc_type 抽取结构化实体。返回 {"doc_type","confidence","entities"...}。"""
+    """按 doc_type 抽取结构化实体。返回 {"doc_type","confidence",...}。"""
     if doc_type == "lab_report":
         return await _extract_lab_report(text)
+    if doc_type == "prescription":
+        return await _extract_prescription(text)
     return {"doc_type": doc_type, "confidence": 0.0, "metrics": []}
+
+
+async def _extract_prescription(text: str) -> dict:
+    if settings.ocr_use_llm_extract and llm_service.is_available:
+        result = await llm_service.extract_json(EXTRACT_PRESCRIPTION_SYSTEM, text)
+        if isinstance(result, dict) and result.get("medications"):
+            result.setdefault("doc_type", "prescription")
+            result.setdefault("confidence", 0.5)
+            return result
+    return _extract_prescription_regex(text)
+
+
+def _extract_prescription_regex(text: str) -> dict:
+    """处方结构复杂、手写/缩写多，正则回退只做最简抽取，通常为空。"""
+    return {"doc_type": "prescription", "confidence": 0.3, "medications": []}
 
 
 async def _extract_lab_report(text: str) -> dict:

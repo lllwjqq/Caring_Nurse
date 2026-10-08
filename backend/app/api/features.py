@@ -195,9 +195,11 @@ async def confirm_document(
         entities["metrics"] = data.metrics
     if data.exam_date is not None:
         entities["exam_date"] = data.exam_date
+    if data.medications is not None:
+        entities["medications"] = data.medications
 
     service = DocumentService()
-    actions = await service.dispatch(db, patient, doc.doc_type, entities)
+    actions = await service.dispatch(db, patient, doc, entities)
     doc.parsed_data = entities
     doc.status = "confirmed"
     await db.flush()

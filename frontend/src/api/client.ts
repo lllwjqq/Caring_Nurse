@@ -62,9 +62,19 @@ export const featureApi = {
   },
   listDocuments: () => api.get('/documents'),
   getDocument: (id: number) => api.get(`/documents/${id}`),
-  confirmDocument: (id: number, data?: { metrics?: unknown[]; exam_date?: string }) =>
-    api.post(`/documents/${id}/confirm`, data ?? {}),
+  confirmDocument: (
+    id: number,
+    data?: { metrics?: unknown[]; exam_date?: string; medications?: unknown[] },
+  ) => api.post(`/documents/${id}/confirm`, data ?? {}),
   rejectDocument: (id: number) => api.post(`/documents/${id}/reject`),
+}
+
+export const reminderApi = {
+  list: () => api.get('/reminders'),
+  today: () => api.get('/reminders/today'),
+  create: (data: Record<string, unknown>) => api.post('/reminders', data),
+  update: (id: number, data: Record<string, unknown>) => api.patch(`/reminders/${id}`, data),
+  remove: (id: number) => api.delete(`/reminders/${id}`),
 }
 
 export const agentApi = {

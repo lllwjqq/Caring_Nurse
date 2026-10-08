@@ -9,6 +9,7 @@ import AlertsPage from './pages/AlertsPage'
 import PlansPage from './pages/PlansPage'
 import FollowupPage from './pages/FollowupPage'
 import DocumentsPage from './pages/DocumentsPage'
+import RemindersPage from './pages/RemindersPage'
 import KnowledgePage from './pages/KnowledgePage'
 import ProfilePage from './pages/ProfilePage'
 import SetupPage from './pages/SetupPage'
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/plans" element={<PlansPage />} />
         <Route path="/followups" element={<FollowupPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/reminders" element={<RemindersPage />} />
         <Route path="/knowledge" element={<KnowledgePage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>

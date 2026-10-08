@@ -26,6 +26,10 @@ class RedisClient:
     async def set_json(self, key: str, value: Any, expire: int | None = None):
         await self.client.set(key, json.dumps(value, ensure_ascii=False), ex=expire)
 
+    async def set_nx(self, key: str, value: str, expire: int) -> bool:
+        """SET NX：首次设置返回 True，已存在返回 False，用于防止重复触发。"""
+        return bool(await self.client.set(key, value, nx=True, ex=expire))
+
     async def get_json(self, key: str) -> Any | None:
         data = await self.client.get(key)
         return json.loads(data) if data else None

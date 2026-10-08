@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     ocr_lang: str = "ch"
     ocr_use_llm_extract: bool = True
 
+    # 服药提醒调度时区（把 times_of_day 的 HH:MM 解析为本地时间）
+    app_timezone: str = "Asia/Shanghai"
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

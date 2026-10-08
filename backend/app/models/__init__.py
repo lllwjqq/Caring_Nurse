@@ -1,8 +1,9 @@
 import enum
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     Enum,
     Float,
@@ -96,6 +97,7 @@ class Patient(Base):
     care_plans: Mapped[list["CarePlan"]] = relationship(back_populates="patient")
     follow_ups: Mapped[list["FollowUp"]] = relationship(back_populates="patient")
     medical_documents: Mapped[list["MedicalDocument"]] = relationship(back_populates="patient")
+    medication_reminders: Mapped[list["MedicationReminder"]] = relationship(back_populates="patient")
 
 
 class HealthRecord(Base):
@@ -198,6 +200,30 @@ class MedicalDocument(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     patient: Mapped["Patient"] = relationship(back_populates="medical_documents")
+
+
+class MedicationReminder(Base):
+    __tablename__ = "medication_reminders"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
+    medication_name: Mapped[str] = mapped_column(String(200))
+    brand_name: Mapped[str | None] = mapped_column(String(200))
+    spec: Mapped[str | None] = mapped_column(String(200))
+    dose: Mapped[float | None] = mapped_column(Float)
+    dose_unit: Mapped[str | None] = mapped_column(String(20))
+    frequency: Mapped[str] = mapped_column(String(20), default="qd")
+    times_of_day: Mapped[list | None] = mapped_column(JSONB, default=list)
+    route: Mapped[str | None] = mapped_column(String(50))
+    timing_note: Mapped[str | None] = mapped_column(String(100))
+    start_date: Mapped[date | None] = mapped_column(Date)
+    end_date: Mapped[date | None] = mapped_column(Date)
+    notes: Mapped[str | None] = mapped_column(Text)
+    source_document_id: Mapped[int | None] = mapped_column(Integer)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    patient: Mapped["Patient"] = relationship(back_populates="medication_reminders")
 
 
 class AgentTrace(Base):

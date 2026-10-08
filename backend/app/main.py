@@ -6,11 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api import agents, auth, features, health, knowledge, patients, voice, websocket
+from app.api import agents, auth, features, health, knowledge, patients, reminders, voice, websocket
 from app.config import settings
 from app.database import Base, engine
 from app.services.redis_client import redis_client
-from app.tasks.scheduler import create_followup_tasks
+from app.tasks.scheduler import create_followup_tasks, dispatch_due_reminders
 
 scheduler = AsyncIOScheduler()
 
@@ -22,6 +22,7 @@ async def lifespan(app: FastAPI):
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         await conn.run_sync(Base.metadata.create_all)
     scheduler.add_job(create_followup_tasks, "cron", hour=8, minute=0, id="daily_followup")
+    scheduler.add_job(dispatch_due_reminders, "interval", minutes=1, id="med_reminder")
     scheduler.start()
     yield
     scheduler.shutdown()
@@ -44,6 +45,7 @@ app.include_router(health.router, prefix="/api")
 app.include_router(features.router, prefix="/api")
 app.include_router(agents.router, prefix="/api")
 app.include_router(knowledge.router, prefix="/api")
+app.include_router(reminders.router, prefix="/api")
 app.include_router(voice.router, prefix="/api")
 app.include_router(websocket.router, prefix="/api")
 

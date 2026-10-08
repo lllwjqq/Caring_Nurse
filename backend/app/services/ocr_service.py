@@ -2,6 +2,7 @@
 
 默认使用 RapidOCR（onnxruntime，轻量、无 GPU 依赖、中文支持好）。
 未安装或初始化失败时回退到 mock 文本，保证开发环境联调不受影响。
+mock 文本按文件名区分处方/化验单，便于无模型环境联调两条链路。
 """
 
 import asyncio
@@ -39,15 +40,15 @@ class OCRService:
     async def extract_text(self, content: bytes, filename: str) -> str:
         """从图片/PDF 字节中提取原始文本。"""
         if self.engine_name == "mock":
-            return _mock_text()
+            return _mock_text(filename)
 
         images = self._to_images(content, filename)
         if not images:
-            return _mock_text()
+            return _mock_text(filename)
 
         engine = self._get_engine()
         if engine is None:
-            return _mock_text()
+            return _mock_text(filename)
 
         loop = asyncio.get_running_loop()
         texts: list[str] = []
@@ -56,7 +57,7 @@ class OCRService:
             if text:
                 texts.append(text)
         joined = "\n".join(texts).strip()
-        return joined or _mock_text()
+        return joined or _mock_text(filename)
 
     def _ocr_one(self, engine, img_bytes: bytes) -> str:
         result, _ = engine(img_bytes)
@@ -87,7 +88,17 @@ class OCRService:
         return images
 
 
-def _mock_text() -> str:
+def _mock_text(filename: str = "") -> str:
+    name = filename.lower()
+    if "处方" in name or "prescription" in name or "rx" in name:
+        return (
+            "处方笺\n"
+            "医院：XX市人民医院 科室：心内科 医生：张医生\n"
+            "日期：2026-10-08\n"
+            "1. 阿司匹林肠溶片 100mg 每次1片 每日1次 口服 早餐后 共30天 忌酒\n"
+            "2. 二甲双胍片 500mg 每次1片 每日2次 口服 饭后 共30天\n"
+            "3. 硝苯地平控释片 30mg 每次1片 每日1次 口服 晨起 共30天"
+        )
     return (
         "体检报告摘要\n"
         "姓名：患者\n"
