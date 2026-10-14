@@ -27,3 +27,9 @@ Thumbs.db
 # Uploads
 uploads/
 backend/.pytest_cache/
+
+# Personal learning notes (not part of the project)
+docs/learn/
+
+# Test recordings (screen recordings from debugging voice)
+*.mp4

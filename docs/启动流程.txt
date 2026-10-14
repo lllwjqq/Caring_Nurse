@@ -1,0 +1,144 @@
+==========================================================
+  贴心小护士（CaringNurse）项目启动流程
+==========================================================
+
+一、项目架构总览
+----------------------------------------------------------
+项目采用 Docker Compose 编排，共 5 个服务容器：
+
+  容器名          镜像                      端口映射（宿主机 -> 容器）
+  --------------- ------------------------ ------------------------------
+  nurse-postgres  pgvector/pgvector:pg16   5432 -> 5432   （PostgreSQL + 向量扩展）
+  nurse-redis     redis:7-alpine           6380 -> 6379   （缓存 / 会话）
+  nurse-minio     minio/minio:latest       9000 -> 9000   （对象存储）
+                                           9001 -> 9001   （MinIO 控制台）
+  nurse-backend   caringnurse-backend      8080 -> 8000   （FastAPI 后端）
+  nurse-frontend  caringnurse-frontend     5173 -> 5173   （Vite + React 前端）
+
+技术栈：
+  - 后端：Python 3.11 + FastAPI + SQLAlchemy(async) + APScheduler
+  - 前端：Node 20 + React 18 + Vite + antd-mobile
+  - 存储：PostgreSQL(pgvector) + Redis + MinIO
+
+
+二、前置条件
+----------------------------------------------------------
+1. 已安装 Docker Desktop，并确保 Docker 守护进程（daemon）正在运行。
+   - 若未运行，先启动 Docker Desktop，等待 daemon 就绪：
+     "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+     然后用 `docker info` 确认可用。
+
+2. 项目根目录存在 .env 文件（首次可复制 .env.example 生成）。
+   - 后端容器通过 env_file 读取 .env，其中 DATABASE_URL / REDIS_URL / MINIO_*
+     / LLM_* / 语音(讯飞、豆包)等关键配置都在此。
+
+3. 无 Python / Node 本地环境要求 —— 全部依赖在容器内安装。
+
+
+三、启动命令
+----------------------------------------------------------
+在项目根目录 D:\code\CaringNurse 下执行：
+
+    docker compose up -d --build
+
+说明：
+  - `--build`：重新构建 backend / frontend 镜像（代码有改动时使用）。
+  - `-d`：后台运行。
+  - 依赖的 postgres / redis / minio 使用官方镜像，无需构建，直接拉取。
+
+
+四、启动顺序与健康检查
+----------------------------------------------------------
+Compose 通过 depends_on + condition: service_healthy 控制顺序：
+
+  postgres / redis / minio 先启动
+      -> 各自健康检查通过
+          -> backend 启动
+              -> frontend 启动
+
+健康检查方式：
+  - postgres：pg_isready
+  - redis：   redis-cli ping
+  - minio：   curl http://localhost:9000/minio/health/live
+
+
+五、后端启动时自动执行的内容（backend/app/main.py lifespan）
+----------------------------------------------------------
+1. 连接 Redis（redis_client.connect）。
+2. 连接数据库，执行：
+     - CREATE EXTENSION IF NOT EXISTS vector（启用 pgvector）
+     - Base.metadata.create_all（按模型自动建表，无独立 migration 工具）
+3. 启动 APScheduler 定时任务：
+     - daily_followup：每天 8:00 生成随访任务
+     - med_reminder：  每分钟派发到期的服药提醒
+4. 注册路由（/api 前缀）：auth、patients、health、features、
+   agents、knowledge、reminders、voice、websocket。
+
+
+六、访问地址
+----------------------------------------------------------
+  前端页面：        http://localhost:5173
+  后端接口：        http://localhost:8080
+  后端 Swagger 文档：http://localhost:8080/docs
+  健康检查：        http://localhost:8080/health
+  MinIO 控制台：    http://localhost:9001  （默认 minioadmin / minioadmin）
+
+
+七、验证是否启动成功
+----------------------------------------------------------
+    # 查看所有容器状态（healthy / Up 即为正常）
+    docker compose ps
+
+    # 后端健康检查返回 200
+    curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health
+
+    # 后端 Swagger 文档返回 200
+    curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/docs
+
+    # 前端页面返回 200
+    curl -s -o /dev/null -w "%{http_code}" http://localhost:5173
+
+    # 查看后端启动日志（末尾应出现 "Application startup complete."）
+    docker logs --tail 50 nurse-backend
+
+
+八、常用运维命令
+----------------------------------------------------------
+    # 停止（保留容器与数据卷）
+    docker compose down
+
+    # 停止并删除数据卷（清空数据库 / Redis / MinIO 数据，慎用）
+    docker compose down -v
+
+    # 仅重启后端（代码改动后）
+    docker compose restart nurse-backend
+
+    # 查看实时日志
+    docker compose logs -f backend
+    docker compose logs -f frontend
+
+
+九、Windows 环境注意事项（重要）
+----------------------------------------------------------
+1. 代码热重载：backend 容器虽使用 `uvicorn --reload`，但
+   Windows 下 Docker 卷挂载 + --reload 往往无法侦测到文件变化。
+   后端代码改动后，请手动重启容器：
+       docker compose restart nurse-backend
+   （或 docker compose up -d --build 重新构建）。
+
+2. 后端宿主机端口为 8080（容器内仍是 8000）。原因：Windows
+   系统保留了 7932-8031 端口段，8000 端口无法绑定，故映射为
+   8080 -> 8000。
+
+3. 前端通过 Vite 代理访问后端，浏览器使用同源 /api，无需配置
+   CORS 跨域；API_PROXY_TARGET 指向容器内 http://backend:8000。
+
+
+十、首次运行建议
+----------------------------------------------------------
+1. 复制配置：cp .env.example .env（如无 .env），按需填写
+   LLM_API_KEY（DeepSeek）、语音（讯飞 / 豆包）等密钥。
+2. 启动：docker compose up -d --build
+3. 打开 http://localhost:5173 验证前端，打开 /docs 验证后端。
+4. 如数据库需要初始化数据，可运行 backend/scripts/seed.py
+   （在 backend 容器内执行）。
