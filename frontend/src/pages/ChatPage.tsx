@@ -221,7 +221,8 @@ export default function ChatPage() {
       const { data } = await voiceApi.transcribe(blob)
       const text = data?.text?.trim()
       if (text) {
-        await sendMessage(text)
+        // 识别结果先填入输入框，由用户确认/编辑后再发送
+        setInput((prev) => (prev.trim() ? `${prev} ${text}` : text))
       } else {
         alert('没有听清，请再说一次')
       }

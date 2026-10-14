@@ -36,6 +36,15 @@ class Settings(BaseSettings):
     iflytek_api_secret: str = ""
     iflytek_tts_voice: str = "xiaoyan"
 
+    # 语音服务提供方：doubao | iflytek
+    voice_provider: str = "doubao"
+
+    # 豆包语音（火山引擎 openspeech，新版控制台 API Key 鉴权：X-Api-Key）
+    doubao_api_key: str = ""
+    doubao_asr_resource_id: str = "volc.seedasr.sauc.duration"
+    doubao_tts_resource_id: str = "seed-tts-2.0"
+    doubao_tts_speaker: str = "zh_female_vv_uranus_bigtts"
+
     # OCR 文档识别（本地 OCR 引擎 + LLM 结构化抽取）
     # rapidocr：本地轻量 OCR（onnxruntime，无 GPU 依赖），未安装时自动回退 mock
     ocr_engine: str = "rapidocr"  # rapidocr | paddleocr | mock
