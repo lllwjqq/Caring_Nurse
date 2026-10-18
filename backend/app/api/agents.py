@@ -10,6 +10,7 @@ from app.api.patients import get_patient_for_user
 from app.auth import get_current_user
 from app.database import get_db
 from app.graph.langgraph_app import run_langgraph as run_agent_graph
+from app.graph.orchestrator import delete_session_records
 from app.graph.streaming import stream_agent_graph
 from app.models import AgentTrace, ChatMessage, User
 from app.schemas import (
@@ -114,3 +115,16 @@ async def get_session_messages(
         .order_by(ChatMessage.created_at)
     )
     return result.scalars().all()
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(
+    session_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """删除某个会话（消息 + trace）。前端负责二次确认与删除后跳转。"""
+    patient = await get_patient_for_user(user, db)
+    await delete_session_records(db, patient.id, session_id)
+    await db.commit()
+    return {"ok": True}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { agentApi, voiceApi } from '../api/client'
 import AgentTraceView from '../components/AgentTrace'
 import { startAudioRecording } from '../lib/audio'
@@ -25,6 +25,9 @@ const QUICK_QUESTIONS = [
 
 const CHAT_SESSION_KEY = 'chat_session_id'
 
+// 输入框自动增高的上限（约 6 行），超过后输入框内部滚动
+const MAX_INPUT_HEIGHT = 150
+
 // TTS 音频缓存（文本 → Blob），重复播放同一句免走接口
 const ttsCache = new Map<string, Blob>()
 
@@ -50,6 +53,9 @@ export default function ChatPage() {
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null)
   const [synthingIdx, setSynthingIdx] = useState<number | null>(null)
   const [sessionId, setSessionId] = useState<string>()
+  const [chatHeight, setChatHeight] = useState<number>()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const recorderRef = useRef<{ stop: () => Promise<Blob> } | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -57,6 +63,29 @@ export default function ChatPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // 固定整体高度：仅对话区内部滚动。容器高度 = 视口高度 - 容器顶部 - 底部预留
+  // （底部预留 80px = 底部导航 pb-16 64px + main 下内边距 py-4 16px）。
+  useLayoutEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => {
+      const viewport = window.visualViewport?.height ?? window.innerHeight
+      const top = el.getBoundingClientRect().top
+      setChatHeight(Math.max(280, viewport - top - 80))
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  // 输入框随内容自动增高，到达上限后内部滚动
+  useEffect(() => {
+    const ta = textareaRef.current
+    if (!ta) return
+    ta.style.height = 'auto'
+    ta.style.height = `${Math.min(ta.scrollHeight, MAX_INPUT_HEIGHT)}px`
+  }, [input])
 
   const stopAudio = () => {
     if (audioRef.current) {
@@ -95,6 +124,26 @@ export default function ChatPage() {
     localStorage.removeItem(CHAT_SESSION_KEY)
     setSessionId(undefined)
     setMessages([WELCOME_MESSAGE])
+  }
+
+  const deleteSession = async (sid: string) => {
+    if (!window.confirm('确认删除该对话？删除后无法恢复。')) return
+    try {
+      await agentApi.deleteSession(sid)
+    } catch {
+      alert('删除失败，请重试')
+      return
+    }
+    const { data } = await agentApi.listSessions()
+    const list = data as SessionSummary[]
+    setSessions(list)
+    // 删除的是当前会话 → 回到空白新对话
+    if (sid === sessionId) {
+      stopAudio()
+      localStorage.removeItem(CHAT_SESSION_KEY)
+      setSessionId(undefined)
+      setMessages([WELCOME_MESSAGE])
+    }
   }
 
   // 进入页面时恢复上次会话（短时记忆）
@@ -234,7 +283,11 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 140px)' }}>
+    <div
+      ref={containerRef}
+      className="flex flex-col overflow-hidden"
+      style={{ height: chatHeight }}
+    >
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         <button
           onClick={startNewChat}
@@ -242,19 +295,31 @@ export default function ChatPage() {
         >
           + 新对话
         </button>
-        {sessions.map((s) => (
-          <button
-            key={s.session_id}
-            onClick={() => switchSession(s.session_id)}
-            className={`shrink-0 max-w-[160px] truncate px-3 py-1.5 rounded-full text-sm border ${
-              s.session_id === sessionId
-                ? 'bg-primary/10 text-primary border-primary'
-                : 'bg-white border-gray-200 text-gray-600'
-            }`}
-          >
-            {s.title || '对话'}
-          </button>
-        ))}
+        {sessions.map((s) => {
+          const active = s.session_id === sessionId
+          return (
+            <div
+              key={s.session_id}
+              className={`shrink-0 flex items-center max-w-[160px] rounded-full text-sm border ${
+                active ? 'bg-primary/10 border-primary' : 'bg-white border-gray-200'
+              }`}
+            >
+              <button
+                onClick={() => switchSession(s.session_id)}
+                className={`truncate pl-3 py-1.5 ${active ? 'text-primary' : 'text-gray-600'}`}
+              >
+                {s.title || '对话'}
+              </button>
+              <button
+                onClick={() => deleteSession(s.session_id)}
+                title="删除对话"
+                className="px-2 py-1.5 text-gray-400 hover:text-red-500"
+              >
+                ×
+              </button>
+            </div>
+          )
+        })}
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto pb-4">
         {messages.map((msg, i) => (
@@ -305,13 +370,21 @@ export default function ChatPage() {
         ))}
       </div>
 
-      <div className="flex gap-2 pt-2">
-        <input
+      <div className="flex gap-2 pt-2 items-end">
+        <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
-          placeholder="输入您的问题..."
-          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl bg-white text-base"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault()
+              sendMessage(input)
+            }
+          }}
+          rows={1}
+          placeholder="输入您的问题...（Shift+Enter 换行）"
+          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl bg-white text-base resize-none overflow-y-auto"
+          style={{ maxHeight: MAX_INPUT_HEIGHT }}
         />
         <button
           onClick={() => sendMessage(input)}

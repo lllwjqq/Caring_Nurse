@@ -83,6 +83,7 @@ export const agentApi = {
   getTraces: (session_id: string) => api.get(`/agents/traces/${session_id}`),
   listSessions: () => api.get('/agents/sessions'),
   getSessionMessages: (session_id: string) => api.get(`/agents/sessions/${session_id}/messages`),
+  deleteSession: (session_id: string) => api.delete(`/agents/sessions/${session_id}`),
   async *chatStream(message: string, sessionId?: string) {
     const token = localStorage.getItem('access_token')
     const res = await fetch(`${API_URL}/api/agents/chat/stream`, {

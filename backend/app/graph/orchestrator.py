@@ -2,17 +2,36 @@ import time
 import uuid
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.models import AgentTrace, CarePlan, ChatMessage, FollowUp, Patient
+from app.services.document_parser import summarize_medical_record
 from app.services.health_service import HealthService
 from app.services.llm_service import llm_service
 from app.services.rag_service import RAGService
 from app.services.redis_client import redis_client
 
 HISTORY_LIMIT = 10
+SESSION_LIMIT = 20  # 每患者最多保留的历史会话数，新建第 21 个时自动删除最旧会话
+
+
+DOCUMENT_MARKERS = (
+    "主诉", "现病史", "既往史", "家族史", "体格检查", "辅助检查",
+    "诊断依据", "治疗方案", "出院医嘱", "入院诊断", "出院诊断",
+    "入院日期", "出院日期", "治疗经过", "实验室检查", "影像学检查",
+)
+
+
+def looks_like_medical_record(message: str) -> bool:
+    """聊天粘贴病历识别：文本足够长且命中至少 2 个病历结构标记词。
+
+    长度门槛避免把「胸痛、呼吸困难」这类短急症描述误判为病历。
+    """
+    if len(message) < 80:
+        return False
+    return sum(1 for marker in DOCUMENT_MARKERS if marker in message) >= 2
 
 
 async def load_history(db: AsyncSession, patient_id: int, session_id: str, limit: int = HISTORY_LIMIT) -> list[dict]:
@@ -29,6 +48,35 @@ async def load_history(db: AsyncSession, patient_id: int, session_id: str, limit
 async def save_message(db: AsyncSession, patient_id: int, session_id: str, role: str, content: str):
     db.add(ChatMessage(patient_id=patient_id, session_id=session_id, role=role, content=content))
     await db.flush()
+
+
+async def delete_session_records(db: AsyncSession, patient_id: int, session_id: str) -> None:
+    """删除某个会话的消息与 trace（会话上限淘汰与用户手动删除共用）。"""
+    await db.execute(
+        delete(ChatMessage).where(
+            ChatMessage.patient_id == patient_id, ChatMessage.session_id == session_id
+        )
+    )
+    await db.execute(
+        delete(AgentTrace).where(
+            AgentTrace.patient_id == patient_id, AgentTrace.session_id == session_id
+        )
+    )
+
+
+async def enforce_session_limit(db: AsyncSession, patient_id: int, limit: int = SESSION_LIMIT) -> None:
+    """超过上限时，按最近活跃时间删除最旧的会话，仅保留最新 limit 个。"""
+    result = await db.execute(
+        select(ChatMessage.session_id, func.max(ChatMessage.created_at).label("last_ts"))
+        .where(ChatMessage.patient_id == patient_id)
+        .group_by(ChatMessage.session_id)
+        .order_by(func.max(ChatMessage.created_at).desc())
+    )
+    sessions = list(result.all())
+    if len(sessions) <= limit:
+        return
+    for session_id, _last_ts in sessions[limit:]:
+        await delete_session_records(db, patient_id, session_id)
 
 
 class AgentContext:
@@ -58,6 +106,22 @@ class AgentContext:
             "duration_ms": duration,
             "output_summary": str(output_data)[:200],
         })
+
+
+async def document_agent(ctx: AgentContext, message: str) -> tuple[str, str]:
+    """病历粘贴：分类 → 结构化抽取 → 口语化摘要。返回 (回复, llm_mode)。"""
+    start = time.time()
+    result = await summarize_medical_record(message)
+    if not result:
+        await ctx.log_trace("document", "medical_record_summary",
+                            {"message": message[:200]}, {"failed": True}, start)
+        return "抱歉，我暂时无法识别这份病历内容，请稍后重试或直接描述您的问题。", "rule"
+    summary_text = result["summary_text"]
+    llm_mode = "llm" if result["summary"].get("summary_text") else "rule"
+    await ctx.log_trace("document", "medical_record_summary",
+                        {"message": message[:200]},
+                        {"doc_type": result["doc_type"], "llm_mode": llm_mode}, start)
+    return "已为您整理病历摘要：\n" + summary_text, llm_mode
 
 
 async def router_agent(ctx: AgentContext, message: str) -> str:
@@ -218,11 +282,28 @@ async def warning_agent(ctx: AgentContext, message: str) -> str:
 
 
 async def run_agent_graph(db: AsyncSession, patient: Patient, message: str, session_id: str | None = None) -> dict[str, Any]:
+    is_new_session = not session_id
     session_id = session_id or str(uuid.uuid4())
     history = await load_history(db, patient.id, session_id)
     ctx = AgentContext(db, patient, session_id, history=history)
 
     await save_message(db, patient.id, session_id, "user", message)
+    if is_new_session:
+        await enforce_session_limit(db, patient.id)
+
+    # 病历识别优先于红旗分流：病历是历史记录，"胸痛"等词不应触发急症回复。
+    if looks_like_medical_record(message):
+        reply, llm_mode = await document_agent(ctx, message)
+        await save_message(db, patient.id, session_id, "assistant", reply)
+        await redis_client.set_patient_context(patient.id, {
+            "session_id": session_id,
+            "last_intent": "document",
+            "diseases": patient.diseases,
+        })
+        return {
+            "reply": reply, "session_id": session_id, "agent_traces": ctx.traces,
+            "care_plan": None, "followup": None, "intent": "document", "llm_mode": llm_mode,
+        }
 
     intent = await router_agent(ctx, message)
     reply = ""

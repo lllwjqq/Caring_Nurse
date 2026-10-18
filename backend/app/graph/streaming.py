@@ -10,8 +10,11 @@ from app.graph.orchestrator import (
     build_consult_messages,
     build_planner_messages,
     create_care_plan,
+    document_agent,
+    enforce_session_limit,
     followup_agent,
     load_history,
+    looks_like_medical_record,
     monitor_agent,
     planner_agent,
     router_agent,
@@ -26,15 +29,29 @@ from app.services.redis_client import redis_client
 async def stream_agent_graph(
     db: AsyncSession, patient: Patient, message: str, session_id: str | None = None
 ) -> AsyncGenerator[dict[str, Any], None]:
+    is_new_session = not session_id
     session_id = session_id or str(uuid.uuid4())
     history = await load_history(db, patient.id, session_id)
     ctx = AgentContext(db, patient, session_id, history=history)
 
+    await save_message(db, patient.id, session_id, "user", message)
+    if is_new_session:
+        await enforce_session_limit(db, patient.id)
+    await db.commit()
+
+    # 病历识别优先于红旗分流：病历是历史记录，"胸痛"等词不应触发急症回复。
+    if looks_like_medical_record(message):
+        reply, llm_mode = await document_agent(ctx, message)
+        yield {"type": "trace", "data": ctx.traces[-1]}
+        yield {"type": "token", "data": reply}
+        await save_message(db, patient.id, session_id, "assistant", reply)
+        await db.commit()
+        yield {"type": "done", "session_id": session_id, "care_plan": None,
+               "followup": None, "intent": "document", "llm_mode": llm_mode}
+        return
+
     intent = await router_agent(ctx, message)
     yield {"type": "trace", "data": ctx.traces[-1]}
-
-    await save_message(db, patient.id, session_id, "user", message)
-    await db.commit()
 
     reply = ""
     care_plan = None

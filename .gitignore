@@ -10,6 +10,7 @@ venv/
 dist/
 build/
 *.egg-info/
+*.tsbuildinfo
 
 # IDE
 .idea/
@@ -30,6 +31,9 @@ backend/.pytest_cache/
 
 # Personal learning notes (not part of the project)
 docs/learn/
+
+# Reference medical records (de-identified samples for prompt/eval, never commit)
+backend/knowledge/samples/
 
 # Test recordings (screen recordings from debugging voice)
 *.mp4

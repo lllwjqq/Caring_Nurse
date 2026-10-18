@@ -8,8 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.graph.orchestrator import (
     AgentContext,
     consult_agent,
+    document_agent,
+    enforce_session_limit,
     followup_agent,
     load_history,
+    looks_like_medical_record,
     monitor_agent,
     planner_agent,
     router_agent,
@@ -138,6 +141,7 @@ agent_graph = build_agent_graph()
 
 
 async def run_langgraph(db: AsyncSession, patient: Patient, message: str, session_id: str | None = None) -> dict[str, Any]:
+    is_new_session = not session_id
     session_id = session_id or str(uuid.uuid4())
     history = await load_history(db, patient.id, session_id)
     initial: GraphState = {
@@ -150,6 +154,24 @@ async def run_langgraph(db: AsyncSession, patient: Patient, message: str, sessio
         "patient": patient,
     }
     await save_message(db, patient.id, session_id, "user", message)
+    if is_new_session:
+        await enforce_session_limit(db, patient.id)
+
+    # 病历识别优先于红旗分流：病历是历史记录，"胸痛"等词不应触发急症回复。
+    if looks_like_medical_record(message):
+        ctx = AgentContext(db, patient, session_id, history=history)
+        reply, llm_mode = await document_agent(ctx, message)
+        await save_message(db, patient.id, session_id, "assistant", reply)
+        await redis_client.set_patient_context(patient.id, {
+            "session_id": session_id,
+            "last_intent": "document",
+            "diseases": patient.diseases,
+        })
+        return {
+            "reply": reply, "session_id": session_id, "agent_traces": ctx.traces,
+            "care_plan": None, "followup": None, "intent": "document", "llm_mode": llm_mode,
+        }
+
     result = await agent_graph.ainvoke(initial)
     reply = result.get("reply", "")
     await save_message(db, patient.id, session_id, "assistant", reply)
