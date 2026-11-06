@@ -6,21 +6,25 @@ interface AgentTrace {
 }
 
 const agentColors: Record<string, string> = {
+  safety: 'bg-red-100 text-red-700',
   router: 'bg-purple-100 text-purple-700',
   consult: 'bg-blue-100 text-blue-700',
   monitor: 'bg-green-100 text-green-700',
   planner: 'bg-orange-100 text-orange-700',
-  followup: 'bg-cyan-100 text-cyan-700',
-  warning: 'bg-red-100 text-red-700',
+  document: 'bg-cyan-100 text-cyan-700',
+  medication: 'bg-amber-100 text-amber-700',
+  diagnosis: 'bg-pink-100 text-pink-700',
 }
 
 const agentLabels: Record<string, string> = {
+  safety: '安全分诊',
   router: '路由Agent',
   consult: '问诊Agent',
   monitor: '监测Agent',
   planner: '方案Agent',
-  followup: '随访Agent',
-  warning: '预警Agent',
+  document: '病历Agent',
+  medication: '用药Agent',
+  diagnosis: '诊断Agent',
 }
 
 export default function AgentTraceView({ traces }: { traces: AgentTrace[] }) {

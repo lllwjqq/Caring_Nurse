@@ -13,7 +13,13 @@ from app.auth import (
 from app.config import settings
 from app.database import get_db
 from app.models import Patient, User, UserRole
-from app.schemas import TokenResponse, UserLogin, UserRegister, UserResponse
+from app.schemas import (
+    ChangePasswordRequest,
+    TokenResponse,
+    UserLogin,
+    UserRegister,
+    UserResponse,
+)
 from app.services.redis_client import redis_client
 
 router = APIRouter(prefix="/auth", tags=["认证"])
@@ -59,6 +65,22 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
 @router.post("/logout")
 async def logout(credentials=Depends(get_current_user)):
     return {"message": "已退出登录"}
+
+
+@router.post("/change-password")
+async def change_password(
+    data: ChangePasswordRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """修改密码（规格附录 A.2）。"""
+    if not verify_password(data.old_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="原密码不正确")
+    if data.old_password == data.new_password:
+        raise HTTPException(status_code=400, detail="新密码不能与原密码相同")
+    user.hashed_password = hash_password(data.new_password)
+    await db.flush()
+    return {"ok": True}
 
 
 @router.post("/refresh", response_model=TokenResponse)

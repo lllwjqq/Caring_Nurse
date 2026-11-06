@@ -29,6 +29,9 @@ export const authApi = {
   register: (data: { email: string; password: string; full_name: string; agreed_disclaimer: boolean }) =>
     api.post('/auth/register', data),
   login: (data: { email: string; password: string }) => api.post('/auth/login', data),
+  logout: () => api.post('/auth/logout'),
+  changePassword: (data: { old_password: string; new_password: string }) =>
+    api.post('/auth/change-password', data),
   me: () => api.get('/auth/me'),
 }
 
@@ -52,9 +55,6 @@ export const featureApi = {
   markAlertRead: (id: number) => api.patch(`/alerts/${id}/read`),
   resolveAlert: (id: number) => api.patch(`/alerts/${id}/resolve`),
   listCarePlans: () => api.get('/care-plans'),
-  listFollowups: () => api.get('/follow-ups'),
-  submitFollowup: (id: number, responses: Record<string, unknown>) =>
-    api.post(`/follow-ups/${id}/submit`, { responses }),
   uploadDocument: (file: File) => {
     const form = new FormData()
     form.append('file', file)
@@ -71,10 +71,28 @@ export const featureApi = {
 
 export const reminderApi = {
   list: () => api.get('/reminders'),
-  today: () => api.get('/reminders/today'),
+  today: (date?: string) => api.get('/reminders/today', { params: date ? { date } : undefined }),
   create: (data: Record<string, unknown>) => api.post('/reminders', data),
   update: (id: number, data: Record<string, unknown>) => api.patch(`/reminders/${id}`, data),
   remove: (id: number) => api.delete(`/reminders/${id}`),
+  checkin: (id: number, data: { date?: string; slot: string; status: 'taken' | 'skipped' }) =>
+    api.post(`/reminders/${id}/checkin`, data),
+  uncheckin: (id: number, params: { date?: string; slot: string }) =>
+    api.delete(`/reminders/${id}/checkin`, { params }),
+}
+
+export const medicationApi = {
+  getSafety: () => api.get('/medication/safety'),
+}
+
+export const diagnosisApi = {
+  list: () => api.get('/diagnoses'),
+}
+
+export const appointmentApi = {
+  list: (status = 'pending') => api.get('/appointments', { params: { status } }),
+  update: (id: number, status: 'done' | 'cancelled') =>
+    api.patch(`/appointments/${id}`, { status }),
 }
 
 export const agentApi = {
@@ -122,7 +140,11 @@ export const voiceApi = {
   transcribe: (blob: Blob) => {
     const form = new FormData()
     form.append('file', blob, 'recording.wav')
-    return api.post('/voice/transcribe', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    // 识别通常 2~5 秒；加 20s 超时，避免后端异常时前端无限卡在「正在识别」
+    return api.post('/voice/transcribe', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 20000,
+    })
   },
   tts: (text: string) => api.post('/voice/tts', { text }, { responseType: 'blob' }),
 }

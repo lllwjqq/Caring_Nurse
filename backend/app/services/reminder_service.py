@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import MedicationReminder
+from app.models import MedicationLog, MedicationReminder
 from app.schemas import MedicationReminderCreate, MedicationReminderUpdate
 
 FREQUENCY_DEFAULT_TIMES: dict[str, list[str]] = {
@@ -97,6 +97,63 @@ class ReminderService:
     async def delete(self, reminder: MedicationReminder) -> None:
         await self.db.delete(reminder)
         await self.db.flush()
+
+    async def get_checks(self, patient_id: int, on_date: date) -> dict[int, dict[str, str]]:
+        """返回某日各提醒的打卡状态：{reminder_id: {时间点: status}}。"""
+        result = await self.db.execute(
+            select(MedicationLog).where(
+                MedicationLog.patient_id == patient_id,
+                MedicationLog.local_date == on_date,
+            )
+        )
+        checks: dict[int, dict[str, str]] = {}
+        for log in result.scalars().all():
+            if log.reminder_id is not None:
+                checks.setdefault(log.reminder_id, {})[log.time_of_day] = log.status
+        return checks
+
+    async def checkin(
+        self, reminder: MedicationReminder, on_date: date, slot: str, status: str
+    ) -> MedicationLog:
+        result = await self.db.execute(
+            select(MedicationLog).where(
+                MedicationLog.reminder_id == reminder.id,
+                MedicationLog.local_date == on_date,
+                MedicationLog.time_of_day == slot,
+            )
+        )
+        log = result.scalar_one_or_none()
+        if log is None:
+            log = MedicationLog(
+                patient_id=reminder.patient_id,
+                reminder_id=reminder.id,
+                medication_name=reminder.medication_name,
+                local_date=on_date,
+                time_of_day=slot,
+                status=status,
+            )
+            self.db.add(log)
+        else:
+            log.status = status
+            log.medication_name = reminder.medication_name
+            log.recorded_at = datetime.now(timezone.utc)
+        await self.db.flush()
+        return log
+
+    async def remove_checkin(self, reminder: MedicationReminder, on_date: date, slot: str) -> bool:
+        result = await self.db.execute(
+            select(MedicationLog).where(
+                MedicationLog.reminder_id == reminder.id,
+                MedicationLog.local_date == on_date,
+                MedicationLog.time_of_day == slot,
+            )
+        )
+        log = result.scalar_one_or_none()
+        if not log:
+            return False
+        await self.db.delete(log)
+        await self.db.flush()
+        return True
 
     async def get_due(self, patient_id: int, hhmm: str, today: date) -> list[MedicationReminder]:
         result = await self.db.execute(

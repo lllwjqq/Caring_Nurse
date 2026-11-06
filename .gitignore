@@ -37,3 +37,6 @@ backend/knowledge/samples/
 
 # Test recordings (screen recordings from debugging voice)
 *.mp4
+
+# Temporary OCR test samples (medical data, never commit)
+backend/.tmp_ocr_samples/

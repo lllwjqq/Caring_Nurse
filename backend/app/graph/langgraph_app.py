@@ -1,192 +1,74 @@
-"""LangGraph 多智能体状态图编排"""
-import uuid
-from typing import Any, TypedDict
+"""LangGraph 图定义（仅用于展示 / 答辩）。
+
+运行时唯一入口是 app.graph.orchestrator.handle_message / handle_stream。
+本文件不再被 API 调用；按规格 §15，不把 db / patient 放进 state。
+"""
+
+from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.graph.orchestrator import (
-    AgentContext,
     consult_agent,
+    diagnosis_agent,
     document_agent,
-    enforce_session_limit,
-    followup_agent,
-    load_history,
-    looks_like_medical_record,
+    medication_agent,
     monitor_agent,
     planner_agent,
     router_agent,
-    save_message,
-    warning_agent,
+    safety_agent,
 )
-from app.models import Patient
-from app.services.llm_service import llm_service
-from app.services.redis_client import redis_client
+
+# 仅用于可视化的 agent 注册表（真正的执行在 orchestrator）
+AGENT_REGISTRY = {
+    "safety": safety_agent,
+    "router": router_agent,
+    "consult": consult_agent,
+    "monitor": monitor_agent,
+    "planner": planner_agent,
+    "document": document_agent,
+    "medication": medication_agent,
+    "diagnosis": diagnosis_agent,
+}
 
 
 class GraphState(TypedDict, total=False):
     message: str
     intent: str
-    reply: str
-    session_id: str
-    patient_id: int
-    history: list[dict]
-    traces: list[dict]
-    care_plan: dict | None
-    followup: dict | None
-    db: Any
-    patient: Any
 
 
-def _make_ctx(state: GraphState) -> AgentContext:
-    return AgentContext(state["db"], state["patient"], state["session_id"], history=state.get("history", []))
-
-
-async def _router_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    state["intent"] = await router_agent(ctx, state["message"])
-    state["traces"] = ctx.traces
+def _pass(state: GraphState) -> GraphState:
     return state
 
 
-async def _consult_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["reply"] = await consult_agent(ctx, state["message"])
-    state["traces"] = ctx.traces
-    return state
-
-
-async def _monitor_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["reply"] = await monitor_agent(ctx, state["message"])
-    state["traces"] = ctx.traces
-    return state
-
-
-async def _planner_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["care_plan"] = await planner_agent(ctx, state["message"])
-    state["reply"] = llm_service.DISCLAIMER + "\n\n已为您生成个性化管理方案，请查看「管理方案」页面。"
-    state["traces"] = ctx.traces
-    return state
-
-
-async def _followup_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["followup"] = await followup_agent(ctx, state["message"])
-    state["reply"] = "已为您创建随访任务，请前往「随访任务」页面完成问卷。"
-    state["traces"] = ctx.traces
-    return state
-
-
-async def _warning_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["reply"] = await warning_agent(ctx, state["message"])
-    state["traces"] = ctx.traces
-    return state
-
-
-async def _consult_with_plan_node(state: GraphState) -> GraphState:
-    ctx = _make_ctx(state)
-    ctx.traces = state.get("traces", [])
-    state["reply"] = await consult_agent(ctx, state["message"])
-    state["traces"] = ctx.traces
-    if any(k in state["message"] for k in ["头晕", "不舒服", "怎么办"]):
-        ctx.traces = state["traces"]
-        state["care_plan"] = await planner_agent(ctx, "根据当前症状调整管理方案")
-        state["traces"] = ctx.traces
-    return state
-
-
-def _route_intent(state: GraphState) -> str:
-    mapping = {
-        "consult": "consult",
-        "monitor": "monitor",
-        "planner": "planner",
-        "followup": "followup",
-        "warning": "warning",
-    }
-    return mapping.get(state.get("intent", "consult"), "consult")
+def _route(state: GraphState) -> str:
+    return state.get("intent", "consult")
 
 
 def build_agent_graph():
     workflow = StateGraph(GraphState)
-    workflow.add_node("router", _router_node)
-    workflow.add_node("consult_agent", _consult_with_plan_node)
-    workflow.add_node("monitor_agent", _monitor_node)
-    workflow.add_node("planner_agent", _planner_node)
-    workflow.add_node("followup_agent", _followup_node)
-    workflow.add_node("warning_agent", _warning_node)
+    workflow.add_node("safety", _pass)
+    workflow.add_node("router", _pass)
+    for name in ("consult", "monitor", "planner", "document", "medication", "diagnosis"):
+        workflow.add_node(name, _pass)
 
-    workflow.set_entry_point("router")
-    workflow.add_conditional_edges("router", _route_intent, {
-        "consult": "consult_agent",
-        "monitor": "monitor_agent",
-        "planner": "planner_agent",
-        "followup": "followup_agent",
-        "warning": "warning_agent",
-    })
-    for node in ["consult_agent", "monitor_agent", "planner_agent", "followup_agent", "warning_agent"]:
-        workflow.add_edge(node, END)
-
+    workflow.set_entry_point("safety")
+    workflow.add_edge("safety", "router")
+    workflow.add_conditional_edges(
+        "router",
+        _route,
+        {
+            "consult": "consult",
+            "monitor": "monitor",
+            "planner": "planner",
+            "document": "document",
+            "medication": "medication",
+            "diagnosis": "diagnosis",
+        },
+    )
+    for name in ("consult", "monitor", "planner", "document", "medication", "diagnosis"):
+        workflow.add_edge(name, END)
     return workflow.compile()
 
 
 agent_graph = build_agent_graph()
-
-
-async def run_langgraph(db: AsyncSession, patient: Patient, message: str, session_id: str | None = None) -> dict[str, Any]:
-    is_new_session = not session_id
-    session_id = session_id or str(uuid.uuid4())
-    history = await load_history(db, patient.id, session_id)
-    initial: GraphState = {
-        "message": message,
-        "session_id": session_id,
-        "patient_id": patient.id,
-        "history": history,
-        "traces": [],
-        "db": db,
-        "patient": patient,
-    }
-    await save_message(db, patient.id, session_id, "user", message)
-    if is_new_session:
-        await enforce_session_limit(db, patient.id)
-
-    # 病历识别优先于红旗分流：病历是历史记录，"胸痛"等词不应触发急症回复。
-    if looks_like_medical_record(message):
-        ctx = AgentContext(db, patient, session_id, history=history)
-        reply, llm_mode = await document_agent(ctx, message)
-        await save_message(db, patient.id, session_id, "assistant", reply)
-        await redis_client.set_patient_context(patient.id, {
-            "session_id": session_id,
-            "last_intent": "document",
-            "diseases": patient.diseases,
-        })
-        return {
-            "reply": reply, "session_id": session_id, "agent_traces": ctx.traces,
-            "care_plan": None, "followup": None, "intent": "document", "llm_mode": llm_mode,
-        }
-
-    result = await agent_graph.ainvoke(initial)
-    reply = result.get("reply", "")
-    await save_message(db, patient.id, session_id, "assistant", reply)
-
-    await redis_client.set_patient_context(patient.id, {
-        "session_id": session_id,
-        "last_intent": result.get("intent"),
-        "diseases": patient.diseases,
-    })
-
-    return {
-        "reply": reply,
-        "session_id": session_id,
-        "agent_traces": result.get("traces", []),
-        "care_plan": result.get("care_plan"),
-        "followup": result.get("followup"),
-        "intent": result.get("intent"),
-    }

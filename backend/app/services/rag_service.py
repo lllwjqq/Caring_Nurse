@@ -70,34 +70,46 @@ class RAGService:
             self.db.add(chunk)
         await self.db.flush()
 
-    async def search(self, query: str, disease: str | None = None, top_k: int = 3) -> list[dict]:
+    async def search(
+        self,
+        query: str,
+        disease: str | None = None,
+        top_k: int = 3,
+        force_keyword: bool = False,
+    ) -> list[dict]:
         await self.seed_knowledge()
-        query_emb = await llm_service.embed(query)
+        if not force_keyword:
+            query_emb = await llm_service.embed(query)
+            try:
+                async with self.db.begin_nested():
+                    sql = """
+                        SELECT id, source, disease, title, content,
+                               1 - (embedding <=> :embedding::vector) as score
+                        FROM knowledge_chunks
+                        WHERE embedding IS NOT NULL
+                    """
+                    params: dict = {"embedding": self._vector_literal(query_emb)}
+                    if disease:
+                        sql += " AND (disease = :disease OR disease = 'general')"
+                        params["disease"] = disease
+                    sql += " ORDER BY embedding <=> :embedding::vector LIMIT :top_k"
+                    params["top_k"] = top_k
+                    result = await self.db.execute(text(sql), params)
+                    rows = result.fetchall()
+                    if rows:
+                        return [
+                            {"source": r.source, "title": r.title, "content": r.content, "score": float(r.score)}
+                            for r in rows
+                        ]
+            except Exception:
+                pass
 
-        try:
-            async with self.db.begin_nested():
-                sql = """
-                    SELECT id, source, disease, title, content,
-                           1 - (embedding <=> :embedding::vector) as score
-                    FROM knowledge_chunks
-                    WHERE embedding IS NOT NULL
-                """
-                params: dict = {"embedding": self._vector_literal(query_emb)}
-                if disease:
-                    sql += " AND (disease = :disease OR disease = 'general')"
-                    params["disease"] = disease
-                sql += " ORDER BY embedding <=> :embedding::vector LIMIT :top_k"
-                params["top_k"] = top_k
-                result = await self.db.execute(text(sql), params)
-                rows = result.fetchall()
-                if rows:
-                    return [
-                        {"source": r.source, "title": r.title, "content": r.content, "score": float(r.score)}
-                        for r in rows
-                    ]
-        except Exception:
-            pass
+        return await self._keyword_search(query, disease, top_k)
 
+    async def _keyword_search(
+        self, query: str, disease: str | None, top_k: int
+    ) -> list[dict]:
+        """关键词降级检索（确定性，供评估脚本与无向量环境复用）。"""
         result = await self.db.execute(select(KnowledgeChunk))
         chunks = result.scalars().all()
         scored = []

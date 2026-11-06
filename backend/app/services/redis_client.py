@@ -34,6 +34,9 @@ class RedisClient:
         data = await self.client.get(key)
         return json.loads(data) if data else None
 
+    async def delete(self, key: str) -> None:
+        await self.client.delete(key)
+
     async def blacklist_token(self, token: str, expire_seconds: int):
         await self.client.set(f"blacklist:{token}", "1", ex=expire_seconds)
 

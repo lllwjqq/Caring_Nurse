@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/client'
 
@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -26,49 +26,62 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/10 to-nurse/10 px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-2">👩‍⚕️</div>
-          <h1 className="text-2xl font-bold text-gray-800">贴心小护士</h1>
-          <p className="text-gray-500 text-sm mt-1">多智能体个性化慢病管理助手</p>
+    <div className="flex min-h-screen items-center justify-center bg-mist px-4">
+      <div className="w-full max-w-shell rounded-card bg-white p-6 shadow-card">
+        <div className="mb-6 text-center">
+          <h1 className="t-h1 text-ink">贴心小护士</h1>
+          <p className="t-cap mt-1 text-ink-soft">多智能体个性化慢病管理助手</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600">邮箱</label>
+            <label className="t-cap text-ink-soft" htmlFor="login-email">
+              邮箱
+            </label>
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
               required
             />
           </div>
           <div>
-            <label className="text-sm text-gray-600">密码</label>
+            <label className="t-cap text-ink-soft" htmlFor="login-password">
+              密码
+            </label>
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
               required
             />
           </div>
-          {error && <p className="text-danger text-sm">{error}</p>}
+
+          {error && <p className="t-cap text-level-red">{error}</p>}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary/90 disabled:opacity-50"
+            className="btn btn-primary w-full"
+            style={{ minHeight: 56 }}
           >
-            {loading ? '登录中...' : '登录'}
+            {loading ? '登录中…' : '登录'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          还没有账号？<Link to="/register" className="text-primary">立即注册</Link>
+        <p className="t-cap mt-4 text-center text-ink-soft">
+          还没有账号？
+          <Link to="/register" className="text-primary-deep">
+            立即注册
+          </Link>
         </p>
-        <p className="text-center text-xs text-gray-400 mt-2">演示账号：demo@nurse.com / demo123</p>
+        <p className="t-cap mt-2 text-center text-ink-soft">演示账号：demo@nurse.com / demo123</p>
       </div>
     </div>
   )

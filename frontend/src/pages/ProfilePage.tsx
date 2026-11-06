@@ -1,90 +1,106 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { authApi, patientApi } from '../api/client'
+import { authApi } from '../api/client'
+import ConfirmDialog from '../components/ConfirmDialog'
+import {
+  BellIcon,
+  ChevronRightIcon,
+  ClipboardIcon,
+  FileTextIcon,
+  SettingsIcon,
+  UserIcon,
+} from '../components/icons'
+import { useAlert } from '../context/AlertContext'
+import { DISEASE_LABELS } from '../lib/types'
 
-const DISEASE_LABELS: Record<string, string> = {
-  diabetes_type2: '2型糖尿病',
-  hypertension: '高血压',
-  hyperlipidemia: '高血脂',
-  copd: '慢阻肺',
+function calcAge(birth?: string | null): number | null {
+  if (!birth) return null
+  const year = Number(birth.slice(0, 4))
+  if (!year) return null
+  const age = new Date().getFullYear() - year
+  return age > 0 && age < 130 ? age : null
 }
 
+const MENU = [
+  { to: '/me/profile', label: '健康档案', Icon: ClipboardIcon },
+  { to: '/me/plans', label: '管理方案', Icon: FileTextIcon },
+  { to: '/me/alerts', label: '预警记录', Icon: BellIcon },
+  { to: '/me/settings', label: '设置', Icon: SettingsIcon },
+]
+
+/** 我的页（规格 §6.5）。 */
 export default function ProfilePage() {
+  const { user, patient } = useAlert()
   const navigate = useNavigate()
-  const [user, setUser] = useState<Record<string, unknown> | null>(null)
-  const [patient, setPatient] = useState<Record<string, unknown> | null>(null)
+  const [logoutOpen, setLogoutOpen] = useState(false)
 
-  useEffect(() => {
-    authApi.me().then((res) => setUser(res.data))
-    patientApi.getProfile().then((res) => setPatient(res.data)).catch(() => {})
-  }, [])
+  const age = calcAge(patient?.birth_date)
+  const diseases = patient?.diseases ?? []
+  const subline = [
+    age != null ? `${age} 岁` : '年龄未填写',
+    diseases.length ? diseases.map((d) => DISEASE_LABELS[d] ?? d).join(' · ') : '慢病未填写',
+  ].join(' · ')
 
-  const handleLogout = () => {
+  const doLogout = async () => {
+    try {
+      await authApi.logout()
+    } catch {
+      /* 后端为空实现，忽略 */
+    }
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-2xl p-4 shadow-sm">
+    <div className="space-y-5 px-5 py-5">
+      <div className="rounded-card bg-white p-5 shadow-card">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-3xl">
-            👤
-          </div>
-          <div>
-            <h2 className="font-bold text-lg">{user?.full_name as string}</h2>
-            <p className="text-sm text-gray-500">{user?.email as string}</p>
+          <span className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-deep">
+            <UserIcon size={36} />
+          </span>
+          <div className="min-w-0">
+            <p className="t-h1 truncate">{user?.full_name || '未登录'}</p>
+            <p className="t-cap mt-1 text-ink-soft">{subline}</p>
           </div>
         </div>
       </div>
 
-      {patient && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm space-y-3">
-          <h3 className="font-semibold">健康档案</h3>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div><span className="text-gray-500">性别</span><p>{patient.gender as string || '-'}</p></div>
-            <div><span className="text-gray-500">出生日期</span><p>{patient.birth_date as string || '-'}</p></div>
-            <div><span className="text-gray-500">身高</span><p>{patient.height_cm ? `${patient.height_cm}cm` : '-'}</p></div>
-            <div><span className="text-gray-500">体重</span><p>{patient.weight_kg ? `${patient.weight_kg}kg` : '-'}</p></div>
-          </div>
-          <div>
-            <span className="text-gray-500 text-sm">慢病类型</span>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {((patient.diseases as string[]) || []).map((d) => (
-                <span key={d} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                  {DISEASE_LABELS[d] || d}
-                </span>
-              ))}
-            </div>
-          </div>
-          {patient.medications ? (
-            <div>
-              <span className="text-gray-500 text-sm">当前用药</span>
-              <p className="text-sm mt-1">{String(patient.medications)}</p>
-            </div>
-          ) : null}
-          <Link to="/setup" className="text-primary text-sm">编辑档案 →</Link>
-        </div>
-      )}
-
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <Link to="/plans" className="block px-4 py-3 border-b text-sm hover:bg-gray-50">管理方案</Link>
-        <Link to="/followups" className="block px-4 py-3 border-b text-sm hover:bg-gray-50">随访任务</Link>
-        <Link to="/documents" className="block px-4 py-3 border-b text-sm hover:bg-gray-50">体检报告</Link>
-        <Link to="/knowledge" className="block px-4 py-3 text-sm hover:bg-gray-50">知识图谱</Link>
+      <div className="overflow-hidden rounded-card bg-white shadow-card">
+        {MENU.map(({ to, label, Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className="flex min-h-[64px] items-center gap-3 border-b border-line px-5 last:border-0"
+          >
+            <Icon size={24} className="text-primary-deep" />
+            <span className="t-body flex-1">{label}</span>
+            <ChevronRightIcon size={22} className="text-ink-soft" />
+          </Link>
+        ))}
       </div>
 
       <button
-        onClick={handleLogout}
-        className="w-full bg-white text-danger py-3 rounded-xl shadow-sm font-medium"
+        type="button"
+        onClick={() => setLogoutOpen(true)}
+        className="flex min-h-[64px] w-full items-center justify-center rounded-card bg-white px-5 shadow-card"
       >
-        退出登录
+        <span className="t-body text-level-red">退出登录</span>
       </button>
 
-      <p className="text-xs text-gray-400 text-center">
+      <p className="t-cap text-center text-ink-soft">
         本平台提供的健康建议仅供参考，不能替代专业医疗诊断和治疗。
       </p>
+
+      <ConfirmDialog
+        open={logoutOpen}
+        title="确认退出登录？"
+        message="退出后需要重新登录才能继续使用。"
+        confirmLabel="退出"
+        danger
+        onConfirm={() => void doLogout()}
+        onCancel={() => setLogoutOpen(false)}
+      />
     </div>
   )
 }

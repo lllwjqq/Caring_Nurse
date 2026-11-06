@@ -1,49 +1,76 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useAlert } from '../context/AlertContext'
+import PageHeader, { type HeaderVariant } from './PageHeader'
+import SosDialog from './SosDialog'
+import TabBar from './TabBar'
+import VoiceConfirmCard from './VoiceConfirmCard'
+import VoiceOrb from './VoiceOrb'
 
-const navItems = [
-  { to: '/', label: '首页', icon: '🏠' },
-  { to: '/records', label: '录入', icon: '📝' },
-  { to: '/chat', label: '问诊', icon: '💬' },
-  { to: '/alerts', label: '预警', icon: '🔔' },
-  { to: '/reminders', label: '用药', icon: '💊' },
-  { to: '/profile', label: '我的', icon: '👤' },
+const TAB_TITLES: Record<string, string> = {
+  '/monitor': '我的健康',
+  '/record': '记录健康数据',
+  '/medication': '我的用药',
+  '/me': '我的',
+}
+
+// 顺序敏感：更具体的子页前缀放前面
+const SUBPAGES: Array<[string, string]> = [
+  ['/me/settings/legal/', '免责声明'],
+  ['/me/settings', '设置'],
+  ['/me/profile', '健康档案'],
+  ['/me/plans', '管理方案'],
+  ['/me/alerts', '预警记录'],
+  ['/record/document/', '确认识别结果'],
 ]
 
+function headerConfig(pathname: string): { variant: HeaderVariant; title?: string } {
+  if (pathname === '/') return { variant: 'identity' }
+
+  const sub = SUBPAGES.find(([prefix]) => pathname.startsWith(prefix))
+  if (sub) {
+    let title = sub[1]
+    if (sub[0] === '/me/settings/legal/') {
+      title = pathname.split('/').pop() === 'privacy' ? '隐私政策' : '免责声明'
+    }
+    return { variant: 'back', title }
+  }
+
+  return { variant: 'title', title: TAB_TITLES[pathname] ?? '贴心小护士' }
+}
+
+/** App Shell（规格 §4.1）：页头 + 独立滚动的 main + TabBar + 语音球。 */
 export default function Layout() {
+  const { pathname } = useLocation()
   const navigate = useNavigate()
+  const { patient } = useAlert()
+  const [sosOpen, setSosOpen] = useState(false)
+
+  const config = headerConfig(pathname)
 
   return (
-    <div className="flex flex-col min-h-screen pb-16">
-      <header className="bg-gradient-to-r from-primary to-nurse text-white px-4 py-3 shadow-md sticky top-0 z-50">
-        <div className="flex items-center justify-between max-w-lg mx-auto">
-          <h1 className="text-lg font-bold">贴心小护士</h1>
-          <button onClick={() => navigate('/plans')} className="text-sm bg-white/20 px-3 py-1 rounded-full">
-            管理方案
-          </button>
-        </div>
-      </header>
+    <div id="app-shell" className="app-shell">
+      <PageHeader
+        variant={config.variant}
+        title={config.title}
+        onBack={() => navigate(-1)}
+        onOpenSos={() => setSosOpen(true)}
+      />
 
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-4">
+      <main id="page-main" className="page-main">
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="flex justify-around max-w-lg mx-auto">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) =>
-                `flex flex-col items-center py-2 px-3 text-xs ${isActive ? 'text-primary font-semibold' : 'text-gray-500'}`
-              }
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </div>
-      </nav>
+      <TabBar />
+      <VoiceOrb />
+      <VoiceConfirmCard />
+
+      <SosDialog
+        open={sosOpen}
+        contact={patient?.emergency_contact ?? null}
+        onClose={() => setSosOpen(false)}
+        onGoSetup={() => navigate('/me/profile')}
+      />
     </div>
   )
 }

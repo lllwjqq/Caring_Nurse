@@ -1,5 +1,4 @@
 import json
-import uuid
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
@@ -9,9 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.patients import get_patient_for_user
 from app.auth import get_current_user
 from app.database import get_db
-from app.graph.langgraph_app import run_langgraph as run_agent_graph
-from app.graph.orchestrator import delete_session_records
-from app.graph.streaming import stream_agent_graph
+from app.graph.orchestrator import (
+    delete_session_records,
+    extract_from_text,
+    handle_message,
+    handle_stream,
+)
 from app.models import AgentTrace, ChatMessage, User
 from app.schemas import (
     AgentTraceResponse,
@@ -19,11 +21,14 @@ from app.schemas import (
     ChatRequest,
     ChatResponse,
     ChatSessionSummary,
+    ExtractRequest,
+    ExtractResponse,
 )
-from app.services.llm_service import llm_service
-from app.services.rag_service import RAGService
+from app.services.memory_service import MemoryService
 
 router = APIRouter(prefix="/agents", tags=["多智能体"])
+
+UNAVAILABLE = "服务暂时不可用，请稍后重试"
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -33,12 +38,17 @@ async def chat(
     db: AsyncSession = Depends(get_db),
 ):
     patient = await get_patient_for_user(user, db)
-    result = await run_agent_graph(db, patient, data.message, data.session_id)
+    result = await handle_message(db, patient, data.message, data.session_id)
     return ChatResponse(
         reply=result["reply"],
         session_id=result["session_id"],
-        agent_traces=result["agent_traces"],
+        agent_traces=result.get("agent_traces", []),
         care_plan=result.get("care_plan"),
+        intent=result.get("intent"),
+        status=result.get("status"),
+        actions=result.get("actions", []),
+        evidence=result.get("evidence", []),
+        presentation=result.get("presentation"),
     )
 
 
@@ -51,10 +61,21 @@ async def chat_stream(
     patient = await get_patient_for_user(user, db)
 
     async def event_generator():
-        async for event in stream_agent_graph(db, patient, data.message, data.session_id):
-            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        try:
+            async for event in handle_stream(db, patient, data.message, data.session_id):
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        except Exception:
+            payload = {"type": "error", "message": UNAVAILABLE}
+            yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@router.post("/extract", response_model=ExtractResponse)
+async def extract(data: ExtractRequest, user: User = Depends(get_current_user)):
+    """文本/语音结构化抽取（只抽取、不写库；规格 §10.3）。"""
+    result = await extract_from_text(data.text)
+    return ExtractResponse(**result)
 
 
 @router.get("/traces/{session_id}", response_model=list[AgentTraceResponse])
@@ -125,6 +146,13 @@ async def delete_session(
 ):
     """删除某个会话（消息 + trace）。前端负责二次确认与删除后跳转。"""
     patient = await get_patient_for_user(user, db)
+    try:
+        # 会话结束先巩固记忆；trace 用独立 session id，避免随后被一起删除
+        await MemoryService(db).consolidate(
+            patient, session_id, trace_session_id=f"{session_id}#consolidated"
+        )
+    except Exception:
+        pass
     await delete_session_records(db, patient.id, session_id)
     await db.commit()
     return {"ok": True}

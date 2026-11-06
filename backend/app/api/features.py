@@ -8,10 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.patients import get_patient_for_user
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Alert, CarePlan, FollowUp, MedicalDocument, User
+from app.models import Alert, Appointment, CarePlan, Diagnosis, FollowUp, MedicalDocument, User
 from app.schemas import (
     AlertResponse,
+    AppointmentResponse,
+    AppointmentUpdate,
     CarePlanResponse,
+    DiagnosisResponse,
     DocumentConfirmRequest,
     DocumentConfirmResponse,
     FollowUpResponse,
@@ -23,6 +26,59 @@ from app.services.document_processing import DocumentService
 from app.services.storage_service import StorageService
 
 router = APIRouter(tags=["业务功能"])
+
+
+@router.get("/diagnoses", response_model=list[DiagnosisResponse])
+async def list_diagnoses(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(Diagnosis)
+        .where(Diagnosis.patient_id == patient.id)
+        .order_by(Diagnosis.created_at.desc())
+    )
+    return result.scalars().all()
+
+
+@router.get("/appointments", response_model=list[AppointmentResponse])
+async def list_appointments(
+    status: str | None = Query(default=None),
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    query = select(Appointment).where(Appointment.patient_id == patient.id)
+    if status:
+        query = query.where(Appointment.status == status)
+    result = await db.execute(query.order_by(Appointment.due_at.asc()))
+    return result.scalars().all()
+
+
+@router.patch("/appointments/{appointment_id}", response_model=AppointmentResponse)
+async def update_appointment(
+    appointment_id: int,
+    data: AppointmentUpdate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    patient = await get_patient_for_user(user, db)
+    result = await db.execute(
+        select(Appointment).where(
+            Appointment.id == appointment_id,
+            Appointment.patient_id == patient.id,
+        )
+    )
+    appointment = result.scalar_one_or_none()
+    if not appointment:
+        raise HTTPException(404, "复诊安排不存在")
+    if data.status is not None:
+        if data.status not in ("pending", "done", "cancelled"):
+            raise HTTPException(400, "非法状态")
+        appointment.status = data.status
+    await db.flush()
+    return appointment
 
 
 @router.get("/alerts", response_model=list[AlertResponse])
@@ -77,7 +133,8 @@ async def list_care_plans(user: User = Depends(get_current_user), db: AsyncSessi
     return result.scalars().all()
 
 
-@router.get("/follow-ups", response_model=list[FollowUpResponse])
+# 随访功能已停用（规格 §10.6）：接口保留仅为兼容旧客户端，前端不再使用
+@router.get("/follow-ups", response_model=list[FollowUpResponse], deprecated=True)
 async def list_followups(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     patient = await get_patient_for_user(user, db)
     result = await db.execute(
@@ -86,7 +143,7 @@ async def list_followups(user: User = Depends(get_current_user), db: AsyncSessio
     return result.scalars().all()
 
 
-@router.post("/follow-ups/{followup_id}/submit", response_model=FollowUpResponse)
+@router.post("/follow-ups/{followup_id}/submit", response_model=FollowUpResponse, deprecated=True)
 async def submit_followup(
     followup_id: int,
     data: FollowUpSubmit,
@@ -123,7 +180,7 @@ async def upload_document(
     content = await file.read()
     file_path = await storage.upload(file.filename or "report.pdf", io.BytesIO(content))
 
-    service = DocumentService()
+    service = DocumentService(db)
     ocr_text, parsed = await service.process(content, file.filename or "")
 
     doc = MedicalDocument(
@@ -134,7 +191,7 @@ async def upload_document(
         confidence=parsed.get("confidence"),
         ocr_text=ocr_text,
         parsed_data=parsed,
-        status="awaiting_confirmation",
+        status=str(parsed.get("status") or "awaiting_confirmation"),
     )
     db.add(doc)
     await db.flush()
@@ -197,9 +254,21 @@ async def confirm_document(
         entities["exam_date"] = data.exam_date
     if data.medications is not None:
         entities["medications"] = data.medications
+    if data.diagnoses is not None:
+        entities["diagnoses"] = data.diagnoses
+    if data.document_date is not None:
+        entities["document_date"] = data.document_date
+    if data.followup_at is not None:
+        entities["followup_at"] = data.followup_at
+    if data.followup_department is not None:
+        entities["followup_department"] = data.followup_department
+    if data.family_history is not None:
+        entities["family_history"] = data.family_history
+    if data.personal_history is not None:
+        entities["personal_history"] = data.personal_history
 
-    service = DocumentService()
-    actions = await service.dispatch(db, patient, doc, entities)
+    service = DocumentService(db)
+    actions = await service.dispatch(db, patient, doc.doc_type, entities, doc.id)
     doc.parsed_data = entities
     doc.status = "confirmed"
     await db.flush()

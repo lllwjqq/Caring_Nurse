@@ -1,9 +1,24 @@
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, computed_field, field_validator
 
 from app.models import AlertLevel, DiseaseType, LifestyleType, RecordType, UserRole
+from app.services.document_labels import (
+    label_action_type,
+    label_alert_level,
+    label_alert_source,
+    label_appointment_status,
+    label_diagnosis_status,
+    label_disease,
+    label_doc_status,
+    label_doc_type,
+    label_frequency,
+    label_record_type,
+    label_route,
+    label_unit,
+    localize_parsed,
+)
 
 
 # Auth
@@ -17,6 +32,11 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=6)
 
 
 class TokenResponse(BaseModel):
@@ -74,6 +94,11 @@ class PatientResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+    @computed_field
+    @property
+    def disease_labels(self) -> list[str]:
+        return [label_disease(d) for d in (self.diseases or [])]
+
 
 # Health Records
 class HealthRecordCreate(BaseModel):
@@ -93,8 +118,20 @@ class HealthRecordResponse(BaseModel):
     extra_data: dict | None
     recorded_at: datetime
     is_abnormal: bool
+    source_document_id: int | None = None
 
     model_config = {"from_attributes": True}
+
+    @computed_field
+    @property
+    def record_type_label(self) -> str:
+        value = self.record_type.value if hasattr(self.record_type, "value") else self.record_type
+        return label_record_type(value)
+
+    @computed_field
+    @property
+    def unit_label(self) -> str:
+        return label_unit(self.unit)
 
 
 class RecordFeedback(BaseModel):
@@ -143,6 +180,17 @@ class AlertResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+    @computed_field
+    @property
+    def level_label(self) -> str:
+        value = self.level.value if hasattr(self.level, "value") else self.level
+        return label_alert_level(value)
+
+    @computed_field
+    @property
+    def source_label(self) -> str:
+        return label_alert_source(self.source)
 
 
 # Care Plans
@@ -195,24 +243,103 @@ class MedicalDocumentResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+    @field_validator("parsed_data")
+    @classmethod
+    def _localize_parsed_data(cls, value):
+        return localize_parsed(value)
+
+    @computed_field
+    @property
+    def doc_type_label(self) -> str:
+        return label_doc_type(self.doc_type)
+
+    @computed_field
+    @property
+    def status_label(self) -> str:
+        return label_doc_status(self.status)
+
 
 class DocumentConfirmRequest(BaseModel):
     metrics: list[dict[str, Any]] | None = None
     exam_date: str | None = None
     medications: list[dict[str, Any]] | None = None
+    diagnoses: list[str] | None = None
+    document_date: str | None = None
+    followup_at: str | None = None
+    followup_department: str | None = None
+    family_history: str | None = None
+    personal_history: str | None = None
 
 
 class DocumentAction(BaseModel):
     type: str
     record_id: int | None = None
     reminder_id: int | None = None
+    diagnosis_id: int | None = None
+    appointment_id: int | None = None
     summary: str
+
+    @computed_field
+    @property
+    def type_label(self) -> str:
+        return label_action_type(self.type)
 
 
 class DocumentConfirmResponse(BaseModel):
     document_id: int
     status: str
     actions: list[DocumentAction]
+
+    @computed_field
+    @property
+    def status_label(self) -> str:
+        return label_doc_status(self.status)
+
+
+class DiagnosisResponse(BaseModel):
+    id: int
+    patient_id: int
+    name: str
+    diagnosed_at: datetime | None
+    doc_type: str
+    source_document_id: int | None
+    status: str
+    notes: str | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+    @computed_field
+    @property
+    def doc_type_label(self) -> str:
+        return label_doc_type(self.doc_type)
+
+    @computed_field
+    @property
+    def status_label(self) -> str:
+        return label_diagnosis_status(self.status)
+
+
+class AppointmentResponse(BaseModel):
+    id: int
+    patient_id: int
+    title: str
+    department: str | None
+    due_at: datetime
+    source_document_id: int | None
+    status: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+    @computed_field
+    @property
+    def status_label(self) -> str:
+        return label_appointment_status(self.status)
+
+
+class AppointmentUpdate(BaseModel):
+    status: str | None = None
 
 
 # Medication Reminders
@@ -268,6 +395,50 @@ class MedicationReminderResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+    @computed_field
+    @property
+    def frequency_label(self) -> str:
+        return label_frequency(self.frequency)
+
+    @computed_field
+    @property
+    def route_label(self) -> str:
+        return label_route(self.route)
+
+    @computed_field
+    @property
+    def timing_note_label(self) -> str:
+        return self.timing_note or "按医嘱"
+
+    @computed_field
+    @property
+    def dose_unit_label(self) -> str:
+        return label_unit(self.dose_unit)
+
+
+class MedicationCheckin(BaseModel):
+    date: str | None = None
+    slot: str
+    status: str
+
+
+class MedicationReminderTodayResponse(MedicationReminderResponse):
+    """今日提醒 + 当日打卡状态：{"08:00": "taken"}。"""
+
+    checks: dict[str, str] = Field(default_factory=dict)
+
+
+class SafetyIssue(BaseModel):
+    level: str
+    title: str
+    why: str
+    advice: str
+    drug_names: list[str] = []
+
+
+class MedicationSafetyResponse(BaseModel):
+    issues: list[SafetyIssue] = []
+
 
 # Agent
 class ChatRequest(BaseModel):
@@ -281,6 +452,24 @@ class ChatResponse(BaseModel):
     agent_traces: list[dict[str, Any]] = []
     care_plan: dict | None = None
     alert: dict | None = None
+    # 规格 §10.1：只增不改
+    intent: str | None = None
+    status: str | None = None
+    actions: list[dict[str, Any]] = []
+    evidence: list[dict[str, Any]] = []
+    presentation: dict[str, Any] | None = None
+
+
+class ExtractRequest(BaseModel):
+    text: str
+
+
+class ExtractResponse(BaseModel):
+    kind: str
+    metric: dict[str, Any] | None = None
+    medication: dict[str, Any] | None = None
+    metrics: list[dict[str, Any]] = []
+    medications: list[dict[str, Any]] = []
 
 
 class AgentTraceResponse(BaseModel):

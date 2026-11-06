@@ -1,67 +1,71 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { patientApi } from '../api/client'
+import { DISEASE_LABELS } from '../lib/types'
 
-const DISEASES = [
-  { value: 'diabetes_type2', label: '2型糖尿病' },
-  { value: 'hypertension', label: '高血压' },
-  { value: 'hyperlipidemia', label: '高血脂' },
-  { value: 'copd', label: '慢阻肺' },
-]
+const DISEASES = Object.entries(DISEASE_LABELS)
 
 export default function SetupPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({
-    gender: '男',
-    birth_date: '',
-    height_cm: '',
-    weight_kg: '',
-    diseases: [] as string[],
-    allergies: '',
-    medications: '',
-    emergency_contact: '',
-  })
+  const [gender, setGender] = useState('男')
+  const [birthDate, setBirthDate] = useState('')
+  const [height, setHeight] = useState('')
+  const [weight, setWeight] = useState('')
+  const [diseases, setDiseases] = useState<string[]>([])
+  const [allergies, setAllergies] = useState('')
+  const [medications, setMedications] = useState('')
+  const [emergencyContact, setEmergencyContact] = useState('')
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const toggleDisease = (value: string) => {
-    setForm((f) => ({
-      ...f,
-      diseases: f.diseases.includes(value)
-        ? f.diseases.filter((d) => d !== value)
-        : [...f.diseases, value],
-    }))
+  const toggleDisease = (key: string) => {
+    setDiseases((prev) =>
+      prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key],
+    )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    setError('')
     setLoading(true)
     try {
       await patientApi.setupProfile({
-        ...form,
-        height_cm: form.height_cm ? parseFloat(form.height_cm) : null,
-        weight_kg: form.weight_kg ? parseFloat(form.weight_kg) : null,
+        gender,
+        birth_date: birthDate || null,
+        height_cm: height ? Number(height) : null,
+        weight_kg: weight ? Number(weight) : null,
+        diseases,
+        allergies: allergies || null,
+        medications: medications || null,
+        emergency_contact: emergencyContact || null,
       })
       navigate('/')
     } catch {
-      alert('建档失败，请重试')
+      setError('建档失败，请重试')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="max-w-lg mx-auto bg-white rounded-2xl shadow p-6">
-        <h1 className="text-xl font-bold mb-2">慢病档案建档</h1>
-        <p className="text-gray-500 text-sm mb-6">请完善您的健康档案，以便为您提供个性化管理方案</p>
+    <div className="min-h-screen bg-mist px-5 py-6">
+      <div className="mx-auto w-full max-w-shell">
+        <h1 className="t-h1 mb-1">慢病档案建档</h1>
+        <p className="t-cap mb-6 text-ink-soft">
+          请完善您的健康档案，以便为您提供个性化管理方案
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-card bg-white p-5 shadow-card">
           <div>
-            <label className="text-sm text-gray-600">性别</label>
+            <label className="t-cap text-ink-soft" htmlFor="setup-gender">
+              性别
+            </label>
             <select
-              value={form.gender}
-              onChange={(e) => setForm({ ...form, gender: e.target.value })}
-              className="w-full mt-1 px-4 py-3 border rounded-xl"
+              id="setup-gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="t-body mt-1 w-full rounded-btn border border-line bg-white px-4 py-3"
+              style={{ minHeight: 48 }}
             >
               <option value="男">男</option>
               <option value="女">女</option>
@@ -69,81 +73,121 @@ export default function SetupPage() {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">出生日期</label>
+            <label className="t-cap text-ink-soft" htmlFor="setup-birth">
+              出生日期
+            </label>
             <input
+              id="setup-birth"
               type="date"
-              value={form.birth_date}
-              onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-              className="w-full mt-1 px-4 py-3 border rounded-xl"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-gray-600">身高(cm)</label>
+              <label className="t-cap text-ink-soft" htmlFor="setup-height">
+                身高（cm）
+              </label>
               <input
+                id="setup-height"
                 type="number"
-                value={form.height_cm}
-                onChange={(e) => setForm({ ...form, height_cm: e.target.value })}
-                className="w-full mt-1 px-4 py-3 border rounded-xl"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+                style={{ minHeight: 48 }}
               />
             </div>
             <div>
-              <label className="text-sm text-gray-600">体重(kg)</label>
+              <label className="t-cap text-ink-soft" htmlFor="setup-weight">
+                体重（kg）
+              </label>
               <input
+                id="setup-weight"
                 type="number"
-                value={form.weight_kg}
-                onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
-                className="w-full mt-1 px-4 py-3 border rounded-xl"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+                style={{ minHeight: 48 }}
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">慢病类型（可多选）</label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {DISEASES.map((d) => (
+            <span className="t-cap text-ink-soft">慢病类型（可多选）</span>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {DISEASES.map(([value, label]) => (
                 <button
-                  key={d.value}
+                  key={value}
                   type="button"
-                  onClick={() => toggleDisease(d.value)}
-                  className={`px-3 py-2 rounded-full text-sm border ${
-                    form.diseases.includes(d.value)
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-white text-gray-600 border-gray-200'
+                  onClick={() => toggleDisease(value)}
+                  aria-pressed={diseases.includes(value)}
+                  className={`t-body rounded-full border px-4 ${
+                    diseases.includes(value)
+                      ? 'bg-primary-deep text-white'
+                      : 'border-line bg-white text-ink'
                   }`}
+                  style={{ minHeight: 48 }}
                 >
-                  {d.label}
+                  {label}
                 </button>
               ))}
             </div>
           </div>
 
-          <input
-            placeholder="过敏史"
-            value={form.allergies}
-            onChange={(e) => setForm({ ...form, allergies: e.target.value })}
-            className="w-full px-4 py-3 border rounded-xl"
-          />
-          <input
-            placeholder="当前用药"
-            value={form.medications}
-            onChange={(e) => setForm({ ...form, medications: e.target.value })}
-            className="w-full px-4 py-3 border rounded-xl"
-          />
-          <input
-            placeholder="紧急联系人电话"
-            value={form.emergency_contact}
-            onChange={(e) => setForm({ ...form, emergency_contact: e.target.value })}
-            className="w-full px-4 py-3 border rounded-xl"
-          />
+          <div>
+            <label className="t-cap text-ink-soft" htmlFor="setup-allergies">
+              过敏史
+            </label>
+            <input
+              id="setup-allergies"
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="如：青霉素"
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
+            />
+          </div>
+
+          <div>
+            <label className="t-cap text-ink-soft" htmlFor="setup-meds">
+              当前用药
+            </label>
+            <input
+              id="setup-meds"
+              value={medications}
+              onChange={(e) => setMedications(e.target.value)}
+              placeholder="如：二甲双胍 0.5g bid"
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
+            />
+          </div>
+
+          <div>
+            <label className="t-cap text-ink-soft" htmlFor="setup-contact">
+              紧急联系人电话
+            </label>
+            <input
+              id="setup-contact"
+              value={emergencyContact}
+              onChange={(e) => setEmergencyContact(e.target.value)}
+              placeholder="如：13800138000"
+              className="t-body mt-1 w-full rounded-btn border border-line px-4 py-3"
+              style={{ minHeight: 48 }}
+            />
+          </div>
+
+          {error && <p className="t-cap text-level-red">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading || form.diseases.length === 0}
-            className="w-full bg-primary text-white py-3 rounded-xl font-medium disabled:opacity-50"
+            disabled={loading || diseases.length === 0}
+            className="btn btn-primary w-full"
+            style={{ minHeight: 56 }}
           >
-            {loading ? '保存中...' : '完成建档'}
+            {loading ? '保存中…' : '完成建档'}
           </button>
         </form>
       </div>

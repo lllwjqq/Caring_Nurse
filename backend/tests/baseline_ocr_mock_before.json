@@ -1,0 +1,71 @@
+[
+  {
+    "file": "OCR测试样例_检验报告单与处方笺.pdf",
+    "ocr_chars": 157,
+    "doc_type": "prescription",
+    "confidence": 0.95,
+    "metrics": [],
+    "medications": [
+      "阿司匹林肠溶片",
+      "二甲双胍片",
+      "硝苯地平控释片"
+    ],
+    "diagnoses": null,
+    "doctor_orders": null,
+    "ocr_excerpt": "处方笺\n医院：XX市人民医院 科室：心内科 医生：张医生\n日期：2026-10-08\n1. 阿司匹林肠溶片 100mg 每次1片 每日1次 口服 早餐后 共30天 忌酒\n2. 二甲双胍片 500mg 每次1片 每日2次 口服 饭后 共30天\n3. 硝苯地平控释片 30mg 每次1片 每日1次 口服 晨起 共30天"
+  },
+  {
+    "file": "OCR测试样例_门诊病历.pdf",
+    "ocr_chars": 134,
+    "doc_type": "lab_report",
+    "confidence": 0.95,
+    "metrics": [
+      {
+        "name": "空腹血糖",
+        "value": 6.8,
+        "unit": "mmol/L",
+        "record_type": "blood_glucose",
+        "confidence": 0.98
+      },
+      {
+        "name": "血压",
+        "value": 135,
+        "unit": "mmHg",
+        "record_type": "blood_pressure",
+        "confidence": 0.98
+      },
+      {
+        "name": "心率",
+        "value": 78,
+        "unit": "次/分",
+        "record_type": "heart_rate",
+        "confidence": 0.98
+      },
+      {
+        "name": "血氧饱和度",
+        "value": 98,
+        "unit": "%",
+        "record_type": "spo2",
+        "confidence": 0.98
+      },
+      {
+        "name": "总胆固醇",
+        "value": 5.2,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.95
+      },
+      {
+        "name": "低密度脂蛋白",
+        "value": 3.1,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.95
+      }
+    ],
+    "medications": [],
+    "diagnoses": null,
+    "doctor_orders": null,
+    "ocr_excerpt": "体检报告摘要\n姓名：患者\n检测日期：2026-10-08\n空腹血糖：6.8 mmol/L\n血压：135/85 mmHg\n心率：78 次/分\n血氧饱和度：98 %\n总胆固醇：5.2 mmol/L\n低密度脂蛋白：3.1 mmol/L\n诊断意见：血糖偏高，血脂异常，建议复查"
+  }
+]

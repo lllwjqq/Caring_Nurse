@@ -11,6 +11,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
@@ -98,6 +99,8 @@ class Patient(Base):
     follow_ups: Mapped[list["FollowUp"]] = relationship(back_populates="patient")
     medical_documents: Mapped[list["MedicalDocument"]] = relationship(back_populates="patient")
     medication_reminders: Mapped[list["MedicationReminder"]] = relationship(back_populates="patient")
+    diagnoses: Mapped[list["Diagnosis"]] = relationship(back_populates="patient")
+    appointments: Mapped[list["Appointment"]] = relationship(back_populates="patient")
 
 
 class HealthRecord(Base):
@@ -111,6 +114,7 @@ class HealthRecord(Base):
     extra_data: Mapped[dict | None] = mapped_column(JSONB, default=dict)
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_abnormal: Mapped[bool] = mapped_column(Boolean, default=False)
+    source_document_id: Mapped[int | None] = mapped_column(Integer, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     patient: Mapped["Patient"] = relationship(back_populates="health_records")
@@ -196,10 +200,45 @@ class MedicalDocument(Base):
     confidence: Mapped[float | None] = mapped_column(Float)
     ocr_text: Mapped[str | None] = mapped_column(Text)
     parsed_data: Mapped[dict | None] = mapped_column(JSONB, default=dict)
-    status: Mapped[str] = mapped_column(String(20), default="uploaded")
+    status: Mapped[str] = mapped_column(String(50), default="uploaded")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     patient: Mapped["Patient"] = relationship(back_populates="medical_documents")
+
+
+class Diagnosis(Base):
+    """诊断记录（OCR 文档归档 / 手动）。"""
+
+    __tablename__ = "diagnoses"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
+    name: Mapped[str] = mapped_column(String(300))
+    diagnosed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    doc_type: Mapped[str] = mapped_column(String(50), default="manual")
+    source_document_id: Mapped[int | None] = mapped_column(Integer, index=True)
+    status: Mapped[str] = mapped_column(String(20), default="current")
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    patient: Mapped["Patient"] = relationship(back_populates="diagnoses")
+
+
+class Appointment(Base):
+    """就诊/复诊安排（复诊提醒来源）。"""
+
+    __tablename__ = "appointments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    department: Mapped[str | None] = mapped_column(String(100))
+    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    source_document_id: Mapped[int | None] = mapped_column(Integer, index=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    patient: Mapped["Patient"] = relationship(back_populates="appointments")
 
 
 class MedicationReminder(Base):
@@ -224,6 +263,67 @@ class MedicationReminder(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     patient: Mapped["Patient"] = relationship(back_populates="medication_reminders")
+
+
+class Drug(Base):
+    """药品库（规格 §11.1）。"""
+
+    __tablename__ = "drugs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    generic_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    brand_names: Mapped[list] = mapped_column(JSONB, default=list)
+    category: Mapped[str] = mapped_column(String(50), default="other")
+    route: Mapped[str | None] = mapped_column(String(50))
+    dosage_forms: Mapped[list] = mapped_column(JSONB, default=list)
+    dose_min: Mapped[float | None] = mapped_column(Float)
+    dose_max: Mapped[float | None] = mapped_column(Float)
+    dose_unit: Mapped[str | None] = mapped_column(String(20))
+    allergy_terms: Mapped[list] = mapped_column(JSONB, default=list)
+    contraindications: Mapped[str | None] = mapped_column(Text)
+    notes: Mapped[str | None] = mapped_column(Text)
+
+
+class DrugInteraction(Base):
+    """药品相互作用（规格 §11.1）。"""
+
+    __tablename__ = "drug_interactions"
+    __table_args__ = (
+        UniqueConstraint("drug_a", "drug_b", name="uq_drug_interaction"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    drug_a: Mapped[str] = mapped_column(String(100), index=True)
+    drug_b: Mapped[str] = mapped_column(String(100), index=True)
+    severity: Mapped[str] = mapped_column(String(20), default="moderate")
+    advice: Mapped[str] = mapped_column(Text)
+
+
+class MedicationLog(Base):
+    """服药打卡日志（规格附录 A.1）。
+
+    与库中既有表结构保持一致：local_date / time_of_day / medication_name / reason。
+    每个「提醒 × 日期 × 时间点」唯一，重复打卡按 upsert 更新状态。
+    """
+
+    __tablename__ = "medication_logs"
+    __table_args__ = (
+        UniqueConstraint(
+            "reminder_id", "local_date", "time_of_day", name="uq_medlog_reminder_date_time"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
+    reminder_id: Mapped[int | None] = mapped_column(
+        ForeignKey("medication_reminders.id", ondelete="SET NULL"), index=True
+    )
+    medication_name: Mapped[str] = mapped_column(String(200))
+    local_date: Mapped[date] = mapped_column(Date, index=True)
+    time_of_day: Mapped[str] = mapped_column(String(10))
+    status: Mapped[str] = mapped_column(String(20))
+    reason: Mapped[str | None] = mapped_column(String(200))
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class AgentTrace(Base):

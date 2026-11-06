@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Alert, AlertLevel, AlertThreshold, HealthRecord, Patient
+from app.services.document_labels import label_alert_level, label_alert_source
 from app.services.ml_service import MLRiskService
 from app.services.redis_client import redis_client
 
@@ -189,8 +190,11 @@ class AlertService:
         alert_data = {
             "id": alert.id,
             "level": alert.level.value,
+            "level_label": label_alert_level(alert.level.value),
             "title": alert.title,
             "message": alert.message,
+            "source": "warning_agent",
+            "source_label": label_alert_source("warning_agent"),
             "suggestion": alert.suggestion,
         }
         await redis_client.push_alert_stream(alert_data)

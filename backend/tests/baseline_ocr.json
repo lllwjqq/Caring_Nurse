@@ -1,0 +1,146 @@
+[
+  {
+    "file": "OCR测试样例_检验报告单与处方笺.pdf",
+    "ocr_chars": 1058,
+    "doc_type": "lab_report",
+    "confidence": 0.95,
+    "metrics": [
+      {
+        "name": "空腹血糖",
+        "value": 8.0,
+        "unit": "mmol/L",
+        "record_type": "blood_glucose",
+        "confidence": 0.98
+      },
+      {
+        "name": "餐后2小时血糖",
+        "value": 14.5,
+        "unit": "mmol/L",
+        "record_type": "blood_glucose",
+        "confidence": 0.98
+      },
+      {
+        "name": "血压",
+        "value": 165.0,
+        "unit": "mmHg",
+        "record_type": "blood_pressure",
+        "confidence": 0.98
+      },
+      {
+        "name": "心率",
+        "value": 78.0,
+        "unit": "次/分",
+        "record_type": "heart_rate",
+        "confidence": 0.98
+      },
+      {
+        "name": "血氧饱和度",
+        "value": 88.0,
+        "unit": "%",
+        "record_type": "spo2",
+        "confidence": 0.98
+      },
+      {
+        "name": "总胆固醇",
+        "value": 5.8,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.98
+      },
+      {
+        "name": "甘油三酯",
+        "value": 2.1,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.98
+      },
+      {
+        "name": "低密度脂蛋白",
+        "value": 4.2,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.98
+      },
+      {
+        "name": "高密度脂蛋白",
+        "value": 1.0,
+        "unit": "mmol/L",
+        "record_type": "blood_lipid",
+        "confidence": 0.98
+      },
+      {
+        "name": "体重",
+        "value": 70.0,
+        "unit": "kg",
+        "record_type": "weight",
+        "confidence": 0.98
+      }
+    ],
+    "medications": [],
+    "diagnoses": [],
+    "doctor_orders": null,
+    "followup_at": null,
+    "family_history": null,
+    "personal_history": null,
+    "warnings": [
+      {
+        "code": "mixed_documents",
+        "message": "这份文件含多种单据，建议分开上传；当前按最可能的类型处理",
+        "field": null,
+        "severity": "warning"
+      }
+    ],
+    "needs_retake": false,
+    "ocr_meta": {
+      "engine": "rapidocr",
+      "is_mock": false,
+      "confidence": 0.9856,
+      "empty": false,
+      "errors": [],
+      "page_count": 2,
+      "page_types": [
+        "lab_report",
+        "prescription"
+      ]
+    },
+    "ocr_excerpt": "【OCR测试样例·全为虚构数据·非真实医疗文书·不可用于就诊／报销／请假或任何证明】\nXX市第一人民医院\n检验报告单 (测试样例)\n姓名\n测测试\n性别\n男\n年龄\n62岁\n检测日期\n2026-10-08\n科室\n体检中心\n标本类型\n全血／血清\n报告编号\nTESTSAMPLE-001\n检测机构\nXX市第一人民医院检验科\n检验结果\n序号\n项目\n结果\n单位\n参考范围\n提示\n1\n空腹血糖\n8.0\nmmo1/L\n3.9 -6.1\n2\n餐后2小时血糖\n14.5\nmmo1/L\n<7.8\n←\n3\n血压\n165/100\nmmHg\n90-140 / 60-90\n4\n心率\n78\n次/分\n60 -100\n5\n血氧饱和度\n88\n%\n95 - 100\n6\n总胆固醇\n5.8\nmmo1/L\n<5.2\n7\n甘油三酯\n2.1\nmmo1/L\n<1.7\n→\n8\n低密度脂蛋白\n4.2\nmmo1/L\n<3.4\n9\n高密度脂蛋白\n1.0\n"
+  },
+  {
+    "file": "OCR测试样例_门诊病历.pdf",
+    "ocr_chars": 468,
+    "doc_type": "outpatient_record",
+    "confidence": 0.9,
+    "metrics": [],
+    "medications": [
+      "二甲双胍",
+      "氨氯地平"
+    ],
+    "diagnoses": [
+      "2型糖尿病",
+      "高血压2级"
+    ],
+    "doctor_orders": [
+      "调整降压方案",
+      "继续口服降糖药",
+      "低盐低脂饮食",
+      "2周后复诊"
+    ],
+    "followup_at": "2026-10-20",
+    "family_history": null,
+    "personal_history": null,
+    "warnings": [],
+    "needs_retake": false,
+    "ocr_meta": {
+      "engine": "rapidocr",
+      "is_mock": false,
+      "confidence": 0.9951,
+      "empty": false,
+      "errors": [],
+      "page_count": 1,
+      "page_types": [
+        "outpatient_record"
+      ]
+    },
+    "ocr_excerpt": "【OCR测试样例：全为虚构数据·非真实医疗文书·不可用于就诊／报销／请假或任何证明】\nXX市人民医院\n门诊病历 (测试样例)\n姓名\n测测试\n性别\n男\n年龄\n62岁\n就诊日期\n2026-10-06\n科室\n门诊内科 (测试)\n门诊号\nMZ20261006001\n主诉：反复头晕3天，伴乏力。\n现病史：患者3天前无明显诱因出现头晕，晨起明显，无恶心呕吐，无胸痛，无呼吸\n困难，自测血压150/95mmHg。\n既往史：2型糖尿病5年，高血压3年，规律服用二甲双胍、氨氯地平；否认药物过敏\n史。\n体格检查：血压152/96mmHg，心率76次/分，神志清楚，双肺呼吸音清。\n辅助检查：空腹血糖7.8mmo1/L，糖化血红蛋白7.5%。\n诊断：2型糖尿病；高血压2级。\n治疗方案：调整降压方案，继续口服降糖药，低盐低脂饮食，2周后复诊。\n记录医师：李医生（测试）记录日期：2026-10-06\n本页为软件OCR识"
+  }
+]

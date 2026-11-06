@@ -1,0 +1,674 @@
+[
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "慢病患者每日食盐摄入应少于5克",
+    "content": "高血压及心脑血管疾病患者应将每日食盐摄入量控制在5克以下（约一啤酒瓶盖），同时减少酱油、味精、腌制品、加工食品等隐形盐的摄入。减盐是降低血压最经济有效的非药物措施之一。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2024, "keywords": ["限盐", "食盐", "钠", "隐形盐"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "general",
+    "title": "慢病患者每周应进行至少150分钟中等强度有氧运动",
+    "content": "糖尿病、高血压、血脂异常稳定期的患者建议每周进行至少150分钟中等强度有氧运动，如快走、慢跑、游泳、骑车，可分5天、每次30分钟完成；每周另加2~3次抗阻训练。运动应循序渐进，避免久坐。合并严重并发症者需在医生指导下运动。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2020, "keywords": ["运动", "有氧运动", "抗阻训练", "150分钟"], "needs_review": false}
+  },
+  {
+    "source": "《中国居民膳食指南（2022）》",
+    "disease": "general",
+    "title": "慢病患者应把体重指数控制在18.5~23.9",
+    "content": "中国成人BMI正常范围为18.5~23.9 kg/m²，超重为24.0~27.9，肥胖为≥28.0。腹型肥胖指男性腰围≥90厘米、女性≥85厘米。超重肥胖的慢病患者减重5%~10%即可显著改善血糖、血压和血脂。减重应通过控制饮食与增加运动实现，避免极端节食。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2022, "keywords": ["体重", "BMI", "腰围", "减重"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "general",
+    "title": "戒烟是慢阻肺和心脑血管疾病最重要的干预措施",
+    "content": "吸烟是慢阻肺最重要的危险因素，也是心脑血管疾病的重要危险因素。戒烟可延缓肺功能下降、降低急性加重和心血管事件风险。戒烟应完全戒断，不建议以“减少吸烟量”替代；必要时可借助戒烟门诊、尼古丁替代疗法或药物辅助。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2021, "keywords": ["戒烟", "吸烟", "慢阻肺", "心血管"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "慢病患者应限制饮酒，最好不饮酒",
+    "content": "过量饮酒会升高血压、加重血脂异常并增加低血糖风险。高血压患者应尽量不饮酒；如饮酒，男性每日酒精摄入不超过25克、女性不超过15克，约相当于啤酒750/450毫升、葡萄酒250/150毫升、高度白酒50/30毫升。糖尿病使用胰岛素或磺脲类药物者饮酒易诱发低血糖。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2024, "keywords": ["饮酒", "酒精", "限酒", "低血糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "长期精神紧张和睡眠不足会升高血压和血糖",
+    "content": "长期精神紧张、焦虑、睡眠不足或睡眠呼吸暂停可激活交感神经，导致血压升高、血糖波动。慢病患者应保证每日7~8小时睡眠，规律作息，学会减压；打鼾伴白天嗜睡者应筛查睡眠呼吸暂停。必要时寻求心理支持。",
+    "metadata": {"knowledge_type": "生活方式", "group": "lifestyle", "guideline_year": 2024, "keywords": ["心理", "睡眠", "压力", "睡眠呼吸暂停"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "general",
+    "title": "慢病管理需要长期规律随访而非一次性就诊",
+    "content": "慢病是不可治愈的长期疾病，需要定期随访、根据指标调整方案。随访内容包括症状评估、指标监测、用药依从性、并发症筛查和生活方式指导。建议病情稳定者每1~3个月随访一次，出现异常及时就诊。规律随访可显著降低并发症和住院风险。",
+    "metadata": {"knowledge_type": "复查", "group": "lifestyle", "guideline_year": 2020, "keywords": ["随访", "复诊", "依从性", "慢病管理"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "突发持续胸痛需警惕急性冠脉综合征",
+    "content": "出现胸骨后压榨性疼痛、闷痛，持续超过15~20分钟不缓解，可放射至左肩、左臂、下颌或背部，伴大汗、恶心、呼吸困难时，应警惕急性心肌梗死。应立即拨打120，停止活动、保持安静，不要自行驾车就医；既往有冠心病者可按医嘱含服硝酸甘油。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2024, "keywords": ["胸痛", "心肌梗死", "急性冠脉综合征", "120"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "突发面瘫、肢体无力、言语不清是卒中征兆",
+    "content": "卒中的典型征兆包括：一侧面部麻木或口角歪斜、一侧肢体无力或麻木、言语不清或理解困难、突发视力障碍、剧烈头痛、行走不稳。可用中风120口诀快速识别：1看一张脸是否不对称，2查两只胳膊是否单侧无力，0（聆）听说话是否清晰。出现任一症状立即拨打120。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2024, "keywords": ["卒中", "中风", "面瘫", "偏瘫", "言语不清"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "夜间阵发性呼吸困难、不能平卧提示急性左心衰",
+    "content": "突发严重呼吸困难、端坐呼吸、夜间憋醒、咳粉红色泡沫痰，是急性左心衰竭的典型表现，常由血压急剧升高诱发。应立即拨打120，取坐位、双腿下垂以减少回心血量，有条件者吸氧；不要平卧。高血压患者出现上述症状提示高血压急症。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2024, "keywords": ["呼吸困难", "端坐呼吸", "左心衰", "粉红色泡沫痰"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "突发晕厥或意识丧失需紧急评估",
+    "content": "晕厥（短暂意识丧失）可能由严重心律失常、体位性低血压、脑血管事件或低血糖引起。发生晕厥时应立即让患者平卧、抬高下肢，保持呼吸道通畅，并尽快就医查明原因。反复晕厥、晕厥伴胸痛/心悸/抽搐者需急诊评估。降压药过量、脱水可导致体位性低血压。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2024, "keywords": ["晕厥", "意识丧失", "体位性低血压", "心律失常"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "general",
+    "title": "意识模糊、嗜睡、昏迷是慢病急症信号",
+    "content": "慢病患者出现意识模糊、嗜睡、反应迟钝甚至昏迷，可能提示糖尿病酮症酸中毒、高渗高血糖状态、低血糖、高血压脑病或严重缺氧，均属急症。应立即拨打120，不要强行喂食喂水；糖尿病患者应尽快测血糖，低血糖者意识清醒时可口服糖水。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2020, "keywords": ["意识模糊", "昏迷", "急症", "酮症酸中毒"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "general",
+    "title": "血压≥180/110 mmHg伴靶器官损害属高血压急症",
+    "content": "血压急剧升高至≥180/110 mmHg，并伴有胸痛、呼吸困难、头痛呕吐、视物模糊、意识改变、少尿等靶器官损害表现，为高血压急症，需立即急诊静脉降压。若无上述症状则为高血压亚急症，也应在24~48小时内就诊调整口服药，不可自行快速降压。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2024, "keywords": ["高血压急症", "血压危象", "180/110", "靶器官损害"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "2型糖尿病以胰岛素抵抗和胰岛β细胞功能缺陷为核心",
+    "content": "2型糖尿病是最常见的糖尿病类型，占糖尿病患者的90%以上。其病理生理核心是胰岛素抵抗（机体对胰岛素不敏感）和胰岛β细胞分泌功能缺陷，导致血糖持续升高。长期高血糖可损害眼、肾、神经、心脑血管等靶器官。该病可防可控，早期干预可显著延缓并发症。",
+    "metadata": {"knowledge_type": "概述", "group": "core", "guideline_year": 2020, "keywords": ["2型糖尿病", "胰岛素抵抗", "β细胞", "高血糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "2型糖尿病的高危人群包括超重肥胖、家族史和年龄≥40岁",
+    "content": "2型糖尿病的高危因素包括：年龄≥40岁、超重或肥胖（尤其腹型肥胖）、一级亲属糖尿病史、既往妊娠糖尿病史、高血压、血脂异常、缺乏运动、多囊卵巢综合征等。高危人群应每年至少检测一次空腹血糖或HbA1c，做到早发现早干预。",
+    "metadata": {"knowledge_type": "病因", "group": "core", "guideline_year": 2020, "keywords": ["高危人群", "超重", "家族史", "筛查"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "2型糖尿病典型症状为三多一少",
+    "content": "典型症状为多饮、多尿、多食和体重下降（三多一少），可伴乏力、视物模糊、皮肤瘙痒、伤口不易愈合、反复感染（如泌尿道、皮肤）。但许多2型糖尿病患者早期无明显症状，仅在体检时发现血糖升高，因此不能凭症状判断有无糖尿病。",
+    "metadata": {"knowledge_type": "症状", "group": "core", "guideline_year": 2020, "keywords": ["三多一少", "多饮", "多尿", "体重下降"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病诊断标准：空腹≥7.0或OGTT 2小时≥11.1 mmol/L",
+    "content": "符合以下任一条件即可诊断糖尿病：空腹血糖≥7.0 mmol/L；口服葡萄糖耐量试验（OGTT）2小时血糖≥11.1 mmol/L；HbA1c≥6.5%；有典型高血糖症状且随机血糖≥11.1 mmol/L。无典型症状者需改日复测确认。空腹指至少8小时未进食。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2020, "keywords": ["诊断标准", "空腹血糖", "OGTT", "HbA1c", "7.0", "11.1"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "2型糖尿病血糖控制目标：空腹4.4~7.0、非空腹<10.0 mmol/L",
+    "content": "多数成年2型糖尿病患者的控制目标为：空腹血糖4.4~7.0 mmol/L，非空腹血糖<10.0 mmol/L，HbA1c<7.0%。年轻、病程短、无并发症者可更严格（HbA1c<6.5%）；老年、有严重低血糖史或合并症者可适当放宽（HbA1c 7.5%~8.0%）。目标应个体化。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2020, "keywords": ["控制目标", "HbA1c", "空腹血糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病管理五驾马车：饮食、运动、药物、监测、教育",
+    "content": "2型糖尿病综合管理包括五个方面：医学营养治疗（饮食）、运动治疗、药物治疗、血糖监测和糖尿病教育，俗称五驾马车。此外还需控制血压、血脂、体重，戒烟限酒。治疗应个体化，根据年龄、并发症、低血糖风险等制定目标与方案。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2020, "keywords": ["五驾马车", "综合管理", "个体化"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病饮食应控制总热量、定时定量、选择低升糖指数食物",
+    "content": "糖尿病饮食治疗的核心是控制每日总热量、均衡营养、定时定量。碳水化合物占总热量的50%~60%，优先选择全谷物、杂豆、薯类等低升糖指数（GI）食物；限制精制糖、含糖饮料和甜点；增加蔬菜和优质蛋白；少油少盐。可参考餐盘法：一半蔬菜、四分之一蛋白、四分之一主食。",
+    "metadata": {"knowledge_type": "饮食", "group": "core", "guideline_year": 2020, "keywords": ["饮食", "低GI", "总热量", "餐盘法"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病患者运动应避免空腹并随身携带糖果",
+    "content": "2型糖尿病患者建议每周至少150分钟中等强度有氧运动（如快走、游泳），每周2~3次抗阻训练。运动宜在餐后1小时进行，避免空腹运动；使用胰岛素或磺脲类药物者应随身携带糖果，预防低血糖。血糖>16.7 mmol/L、有明显酮症或严重并发症时应暂缓运动。",
+    "metadata": {"knowledge_type": "运动", "group": "core", "guideline_year": 2020, "keywords": ["运动", "低血糖", "餐后运动", "抗阻"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "二甲双胍是2型糖尿病一线用药，合并心肾疾病优先GLP-1RA或SGLT2i",
+    "content": "2型糖尿病药物治疗首选二甲双胍，若无禁忌应贯穿治疗全程。合并动脉粥样硬化性心血管疾病、心力衰竭或慢性肾病者，无论HbA1c是否达标，均优先联合GLP-1受体激动剂或SGLT2抑制剂，以获得心肾保护。用药应个体化，注意低血糖风险和肝肾功能。",
+    "metadata": {"knowledge_type": "用药原则", "group": "core", "guideline_year": 2020, "keywords": ["二甲双胍", "GLP-1", "SGLT2", "心肾保护"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "血糖监测频率因治疗方案而异",
+    "content": "使用胰岛素治疗者建议每日监测血糖≥3次（空腹、餐后、睡前等）；仅口服降糖药且血糖稳定者每周监测2~4次不同时点。HbA1c反映近2~3个月平均血糖，建议每3个月检测一次。应记录血糖值、饮食和用药，便于医生调整方案。血糖仪需定期校准。",
+    "metadata": {"knowledge_type": "自我监测", "group": "core", "guideline_year": 2020, "keywords": ["血糖监测", "HbA1c", "监测频率"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病患者应每年筛查眼底、肾脏、神经和足部并发症",
+    "content": "2型糖尿病患者确诊后应每年检查：眼底（糖尿病视网膜病变）、尿微量白蛋白/肌酐比值（糖尿病肾病）、足部（糖尿病足）、神经病变筛查，以及血脂、血压、肾功能、心电图。HbA1c每3个月一次。早期发现并发症可显著延缓进展。",
+    "metadata": {"knowledge_type": "复查", "group": "core", "guideline_year": 2020, "keywords": ["并发症筛查", "眼底", "尿微量白蛋白", "糖尿病足"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病常见误区：无糖食品可随便吃、血糖正常就停药",
+    "content": "常见误区包括：无糖食品不含蔗糖但仍含淀粉和热量，不能随便吃；只查空腹血糖，忽视餐后血糖和HbA1c；血糖正常就自行停药，导致反弹；认为胰岛素会上瘾，拒绝使用；迷信偏方或保健品替代正规治疗。糖尿病需长期规范管理。",
+    "metadata": {"knowledge_type": "常见误区", "group": "core", "guideline_year": 2020, "keywords": ["误区", "无糖食品", "停药", "胰岛素"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "血糖<3.9 mmol/L为低血糖，需立即补充15克碳水化合物",
+    "content": "低血糖指血糖<3.9 mmol/L，表现为心慌、出汗、手抖、饥饿感、头晕，严重者可意识障碍甚至昏迷。意识清醒者应立即口服15克碳水化合物（如3~4块方糖、半杯果汁），15分钟后复测血糖，仍低则重复。意识不清者禁止喂食，应立即拨打120并静脉推注葡萄糖。使用胰岛素或磺脲类药物者风险较高。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2020, "keywords": ["低血糖", "3.9", "补糖", "意识障碍"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "血糖>16.7 mmol/L伴多尿口渴意识改变需警惕酮症酸中毒",
+    "content": "血糖显著升高（>16.7 mmol/L）伴多尿、口渴、乏力、恶心呕吐、腹痛、呼吸深快有烂苹果味、意识模糊，可能为糖尿病酮症酸中毒（DKA）；老年患者以严重高血糖、脱水、意识障碍为主，可能为高渗高血糖状态（HHS）。二者均属急症，需立即就医补液和胰岛素治疗。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2020, "keywords": ["酮症酸中毒", "高渗", "16.7", "烂苹果味"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病患者应每日检查足部，预防糖尿病足",
+    "content": "糖尿病足是糖尿病严重并发症，可导致溃疡、感染甚至截肢。患者应每日检查双足有无破损、水疱、红肿、胼胝；洗脚水温<37℃，洗后擦干趾缝；穿合脚软底鞋和浅色棉袜，不赤脚行走；不用热水袋直接暖脚；趾甲平剪。发现足部破损或感染应立即就医。",
+    "metadata": {"knowledge_type": "并发症", "group": "core", "guideline_year": 2020, "keywords": ["糖尿病足", "足部护理", "溃疡", "截肢"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》",
+    "disease": "diabetes_type2",
+    "title": "糖尿病可损害眼、肾、神经、心脑血管等靶器官",
+    "content": "长期高血糖导致糖尿病慢性并发症，包括微血管病变（视网膜病变、肾病、神经病变）和大血管病变（冠心病、脑卒中、外周动脉疾病）。并发症早期常无症状，因此需定期筛查。控制血糖、血压、血脂和戒烟是预防并发症的关键。",
+    "metadata": {"knowledge_type": "并发症", "group": "core", "guideline_year": 2020, "keywords": ["并发症", "视网膜病变", "糖尿病肾病", "大血管"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "原发性高血压占高血压的90%~95%",
+    "content": "高血压是以体循环动脉压持续升高为特征的慢性疾病，原发性高血压占90%~95%，与遗传、高盐饮食、超重肥胖、过量饮酒、精神紧张、缺乏运动等因素相关；继发性高血压由肾脏疾病、内分泌疾病等引起，占5%~10%。高血压是心脑血管疾病最重要的可控危险因素。",
+    "metadata": {"knowledge_type": "概述", "group": "core", "guideline_year": 2024, "keywords": ["高血压", "原发性", "继发性", "危险因素"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压的主要危险因素包括高盐、肥胖、饮酒和遗传",
+    "content": "高血压的危险因素包括：高盐饮食（钠摄入过多）、超重和肥胖、过量饮酒、长期精神紧张、缺乏体力活动、年龄增长、高血压家族史、糖尿病和血脂异常。其中高盐、肥胖、饮酒和缺乏运动是可控因素，改善生活方式有助于预防和控制高血压。",
+    "metadata": {"knowledge_type": "病因", "group": "core", "guideline_year": 2024, "keywords": ["危险因素", "高盐", "肥胖", "饮酒", "遗传"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "诊室血压≥140/90 mmHg可诊断高血压",
+    "content": "在未使用降压药的情况下，非同日3次测量诊室血压≥140/90 mmHg即可诊断高血压。家庭自测血压≥135/85 mmHg、24小时动态血压平均值≥130/80 mmHg（白天≥135/85、夜间≥120/70）也提示高血压。单次血压升高不能确诊，需规范测量确认。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2024, "keywords": ["诊断", "140/90", "家庭血压", "动态血压"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压按血压水平分为1、2、3级",
+    "content": "高血压1级：收缩压140~159 mmHg和/或舒张压90~99 mmHg；2级：160~179和/或100~109 mmHg；3级：≥180和/或≥110 mmHg。收缩压≥140且舒张压<90为单纯收缩期高血压，多见于老年人。分级越高，心脑血管风险越大，治疗越要积极。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2024, "keywords": ["分级", "1级", "2级", "3级", "单纯收缩期"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压常无症状，头晕头痛不等于血压高",
+    "content": "大多数高血压患者早期无明显症状，常在体检时发现。部分患者可有头晕、头痛、颈项板紧、心悸、耳鸣、疲劳等非特异性症状，但症状与血压水平不一定平行——没有症状不代表血压正常，血压很高也可能无不适。因此不能凭感觉判断血压，应定期测量。",
+    "metadata": {"knowledge_type": "症状", "group": "core", "guideline_year": 2024, "keywords": ["症状", "头晕", "无症状", "体检"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压一般控制目标为<140/90 mmHg",
+    "content": "一般高血压患者血压应控制在<140/90 mmHg，能耐受者可进一步降至<130/80 mmHg。合并糖尿病、慢性肾病、冠心病、心力衰竭者建议<130/80 mmHg。65岁以上老年人可先降至<150/90 mmHg，耐受良好再<140/90 mmHg。目标应个体化，避免降压过快过低。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2024, "keywords": ["控制目标", "140/90", "130/80", "个体化"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压治疗包括生活方式干预和药物治疗",
+    "content": "高血压治疗应生活方式干预与药物治疗并举。所有患者均需限盐、减重、运动、戒烟限酒、心理平衡。血压≥140/90 mmHg者通常需启动药物治疗；1级高血压且低危者可先生活方式干预1~3个月，不达标再用药。降压药应小剂量起始、长期服用，优先选择长效制剂和单片复方。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2024, "keywords": ["生活方式", "药物治疗", "长效制剂", "单片复方"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压饮食应限盐、补钾、控制体重",
+    "content": "高血压患者饮食应做到：每日食盐<5克，减少腌制品和加工食品；增加富含钾的食物（新鲜蔬菜、水果、豆类），但肾功能不全者需遵医嘱；控制总热量和体重；限制饮酒；减少饱和脂肪和反式脂肪。可参考DASH饮食模式，多蔬果、低脂奶、全谷物、少红肉。",
+    "metadata": {"knowledge_type": "饮食", "group": "core", "guideline_year": 2024, "keywords": ["饮食", "限盐", "补钾", "DASH"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压患者适合有氧运动，避免憋气用力",
+    "content": "高血压患者建议每周进行≥150分钟中等强度有氧运动（快走、慢跑、游泳、骑车），可分散到每周5天、每次30分钟。避免举重、憋气用力等可使血压骤升的运动。血压未控制（≥180/110 mmHg）或合并不稳定心绞痛时应暂缓运动。运动应循序渐进，监测血压。",
+    "metadata": {"knowledge_type": "运动", "group": "core", "guideline_year": 2024, "keywords": ["运动", "有氧运动", "憋气", "血压骤升"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "常用降压药包括ACEI、ARB、CCB、利尿剂和β受体阻滞剂",
+    "content": "一线降压药有五大类：血管紧张素转换酶抑制剂（ACEI，如培哚普利）、血管紧张素Ⅱ受体拮抗剂（ARB，如缬沙坦）、钙通道阻滞剂（CCB，如氨氯地平）、利尿剂（如氢氯噻嗪）和β受体阻滞剂（如美托洛尔）。多数患者需联合用药，常用ARB/ACEI+CCB或+利尿剂。合并症不同，药物选择不同。",
+    "metadata": {"knowledge_type": "用药原则", "group": "core", "guideline_year": 2024, "keywords": ["降压药", "ACEI", "ARB", "CCB", "利尿剂", "β受体阻滞剂"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "家庭血压监测应在早晚各测一次并记录",
+    "content": "建议使用经认证的上臂式电子血压计，每日早晚各测1次，每次间隔1分钟测2~3遍取平均值，记录并就诊时带给医生。测量前静坐5分钟，30分钟内不吸烟、不喝咖啡、不运动。家庭血压目标一般<135/85 mmHg。初诊或调整药物期间可连续测7天。",
+    "metadata": {"knowledge_type": "自我监测", "group": "core", "guideline_year": 2024, "keywords": ["家庭血压", "监测", "135/85", "记录"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "规范测量血压的要点",
+    "content": "测量血压应：静坐休息5分钟，背部有支撑，双脚平放；上臂裸露，袖带下缘在肘窝上2~3厘米，与心脏同高；袖带大小合适（过小会高估）；测量时不说话、不活动；同一时间、同一手臂测量并记录。首诊应测双上肢血压。心律失常者建议用听诊法或动态血压。",
+    "metadata": {"knowledge_type": "自我监测", "group": "core", "guideline_year": 2024, "keywords": ["测量规范", "袖带", "上臂", "双上肢"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压患者应定期复查靶器官损害",
+    "content": "高血压患者每1~3个月复诊评估血压和用药；每年检查血脂、血糖、肾功能、尿常规/尿微量白蛋白、心电图、眼底，必要时超声心动图。这些检查用于评估心、脑、肾、眼底等靶器官损害和心血管风险。出现血压波动或症状加重应随时就诊。",
+    "metadata": {"knowledge_type": "复查", "group": "core", "guideline_year": 2024, "keywords": ["复查", "靶器官", "眼底", "肾功能"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》",
+    "disease": "hypertension",
+    "title": "高血压常见误区：没症状不吃药、血压正常就停药",
+    "content": "常见误区包括：没有症状就不用吃药，高血压是无声杀手；血压正常就自行停药，导致反弹和波动；认为降压越快越好，擅自加量；用保健品、降压枕等替代药物；只吃药不测血压、不复诊。高血压需长期规范治疗和监测。",
+    "metadata": {"knowledge_type": "常见误区", "group": "core", "guideline_year": 2024, "keywords": ["误区", "停药", "保健品", "无声杀手"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常是动脉粥样硬化性心血管疾病的主要危险因素",
+    "content": "血脂异常通常指总胆固醇、甘油三酯、低密度脂蛋白胆固醇（LDL-C）升高和/或高密度脂蛋白胆固醇（HDL-C）降低。LDL-C是动脉粥样硬化性心血管疾病（ASCVD）最重要的致病性危险因素。血脂异常多数无症状，需通过血脂检测发现。",
+    "metadata": {"knowledge_type": "概述", "group": "core", "guideline_year": 2023, "keywords": ["血脂异常", "LDL-C", "ASCVD", "危险因素"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常的原因包括遗传、不良饮食和继发疾病",
+    "content": "血脂异常的原因包括：遗传因素（家族性高胆固醇血症）、高饱和脂肪和反式脂肪饮食、超重肥胖、缺乏运动、过量饮酒，以及继发因素如甲状腺功能减退、肾病综合征、糖尿病、胆道疾病和某些药物（如糖皮质激素、噻嗪类利尿剂）。发现血脂异常应评估继发原因。",
+    "metadata": {"knowledge_type": "病因", "group": "core", "guideline_year": 2023, "keywords": ["病因", "遗传", "饮食", "继发性", "甲状腺功能减退"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂管理以LDL-C为首要干预靶点",
+    "content": "血脂检测基本项目包括总胆固醇、甘油三酯、LDL-C、HDL-C。LDL-C是首要干预靶点。根据是否合并ASCVD、糖尿病、高血压及危险因素数量，将患者分为低危、中危、高危、极高危和超高危，不同危险分层对应不同的LDL-C目标值。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2023, "keywords": ["LDL-C", "危险分层", "低危", "极高危"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "不同危险分层LDL-C目标值不同",
+    "content": "LDL-C目标值：低危<3.4 mmol/L；中危、高危<2.6 mmol/L；极高危<1.8 mmol/L；超高危<1.4 mmol/L，且较基线降低≥50%。极高危包括已患ASCVD者，超高危指反复发生心血管事件或合并多项危险因素者。具体分层应由医生评估。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2023, "keywords": ["LDL-C目标", "3.4", "2.6", "1.8", "1.4"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常多数无症状，严重者可出现黄色瘤",
+    "content": "血脂异常通常没有明显症状，多在体检时发现。严重高胆固醇血症可出现黄色瘤（眼睑、肌腱、皮肤黄色结节）、角膜环；严重高甘油三酯血症可诱发急性胰腺炎。因此不能凭症状判断血脂是否正常，应定期检测。",
+    "metadata": {"knowledge_type": "症状", "group": "core", "guideline_year": 2023, "keywords": ["症状", "黄色瘤", "角膜环", "无症状"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常治疗以他汀为基础，生活方式干预贯穿始终",
+    "content": "血脂异常治疗包括生活方式干预和药物治疗。他汀类药物是降低LDL-C的基石；单药不达标可联合依折麦布，仍不达标可加用PCSK9抑制剂。以甘油三酯升高为主者可选贝特类或高纯度鱼油。治疗需长期坚持，达标后仍需维持。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2023, "keywords": ["他汀", "依折麦布", "贝特类", "PCSK9"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常饮食应限制饱和脂肪和反式脂肪",
+    "content": "血脂异常患者应减少饱和脂肪（肥肉、动物油、奶油）和反式脂肪（部分油炸食品、糕点）摄入；每日烹调油25~30克；增加膳食纤维（全谷物、蔬菜、豆类）；适量摄入深海鱼；限制胆固醇高的食物；戒酒。饮食控制可降低LDL-C约5%~10%，但不能替代药物治疗。",
+    "metadata": {"knowledge_type": "饮食", "group": "core", "guideline_year": 2023, "keywords": ["饮食", "饱和脂肪", "反式脂肪", "膳食纤维"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常患者应坚持规律有氧运动",
+    "content": "血脂异常患者建议每周≥150分钟中等强度有氧运动，如快走、慢跑、游泳、骑车，可降低甘油三酯、升高HDL-C。运动应循序渐进、长期坚持，配合控制体重。合并冠心病者应在医生评估后运动。",
+    "metadata": {"knowledge_type": "运动", "group": "core", "guideline_year": 2023, "keywords": ["运动", "有氧运动", "甘油三酯", "HDL-C"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "他汀类药物是降LDL-C的首选药物",
+    "content": "他汀类通过抑制胆固醇合成降低LDL-C，常用中等强度他汀包括阿托伐他汀10~20mg/日、瑞舒伐他汀5~10mg/日。用药后4~6周复查血脂、肝酶和肌酸激酶（CK）。单药不达标可联合依折麦布10mg/日；极高危/超高危患者可考虑PCSK9抑制剂。具体方案需医生制定。",
+    "metadata": {"knowledge_type": "用药原则", "group": "core", "guideline_year": 2023, "keywords": ["他汀", "中等强度", "依折麦布", "PCSK9"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "服用他汀需监测肝酶和肌酸激酶",
+    "content": "服用他汀期间若出现不明原因的肌肉酸痛、乏力、尿色加深，应及时就医并检测肌酸激酶（CK）。肝酶（ALT）升高超过正常上限3倍或CK超过正常上限5倍时，需在医生指导下减量或停药。多数他汀耐受良好，严重不良反应罕见。",
+    "metadata": {"knowledge_type": "自我监测", "group": "core", "guideline_year": 2023, "keywords": ["他汀", "肝酶", "CK", "肌病"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂异常患者应定期复查血脂",
+    "content": "启动调脂治疗或调整剂量后4~6周应复查血脂、肝酶和CK；达标且稳定后每3~6个月复查一次；未达标者每3个月复查。已患ASCVD者建议每年至少检测一次血脂。复查有助于评估疗效和安全性。",
+    "metadata": {"knowledge_type": "复查", "group": "core", "guideline_year": 2023, "keywords": ["复查", "血脂", "4~6周", "ASCVD"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "血脂常见误区：血脂正常就停药、瘦人不会高血脂",
+    "content": "常见误区包括：血脂达标就自行停药，导致反弹；认为瘦人不会高血脂，实际上体型正常者也可因遗传或饮食出现血脂异常；只靠饮食不吃药，高危患者单靠饮食难以达标；认为他汀伤肝伤肾而拒绝使用，延误治疗。调脂治疗需长期规范。",
+    "metadata": {"knowledge_type": "常见误区", "group": "core", "guideline_year": 2023, "keywords": ["误区", "停药", "瘦人", "他汀"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "甘油三酯≥5.6 mmol/L需警惕急性胰腺炎",
+    "content": "甘油三酯显著升高（≥5.6 mmol/L）时，急性胰腺炎风险明显增加。若出现剧烈持续性上腹痛、向背部放射、伴恶心呕吐，应立即就医。此类患者应严格低脂饮食、戒酒，并在医生指导下使用降甘油三酯药物（如贝特类或高纯度鱼油）。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2023, "keywords": ["甘油三酯", "5.6", "急性胰腺炎", "腹痛"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》",
+    "disease": "hyperlipidemia",
+    "title": "他汀与某些药物联用会增加肌病风险",
+    "content": "阿托伐他汀、辛伐他汀主要经CYP3A4代谢，与克拉霉素、伊曲康唑、环孢素、部分抗病毒药及葡萄柚汁合用可升高他汀血药浓度，增加肌病风险。与贝特类（尤其吉非贝齐）联用也会增加肌病风险。联合用药前应告知医生正在服用的所有药物。",
+    "metadata": {"knowledge_type": "用药原则", "group": "core", "guideline_year": 2023, "keywords": ["他汀", "相互作用", "CYP3A4", "肌病"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺以持续气流受限为特征，可防可治",
+    "content": "慢性阻塞性肺疾病（慢阻肺，COPD）是一种常见的、可预防和治疗的慢性气道疾病，以持续气流受限和相应呼吸道症状为特征。气流受限呈进行性发展，与气道和肺组织对烟草烟雾等有害颗粒或气体的慢性炎症反应有关。吸烟是最重要的危险因素。",
+    "metadata": {"knowledge_type": "概述", "group": "core", "guideline_year": 2021, "keywords": ["慢阻肺", "COPD", "气流受限", "可防可治"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "吸烟是慢阻肺最重要的危险因素",
+    "content": "慢阻肺的危险因素包括：吸烟（最重要）、长期暴露于生物燃料烟雾（如柴火、煤炉）、职业粉尘和化学物质、空气污染、反复呼吸道感染、儿童期肺发育不良，以及遗传因素（如α1-抗胰蛋白酶缺乏）。戒烟是预防慢阻肺发生和进展最有效的措施。",
+    "metadata": {"knowledge_type": "病因", "group": "core", "guideline_year": 2021, "keywords": ["病因", "吸烟", "生物燃料", "α1-抗胰蛋白酶"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺典型症状为慢性咳嗽、咳痰和进行性呼吸困难",
+    "content": "慢阻肺的主要症状是慢性咳嗽（常为首发）、咳痰和进行性加重的呼吸困难（气短、喘息、胸闷），活动后加重。早期可仅在剧烈活动时气短，随病情进展日常活动甚至休息时也感气短。部分患者以反复急性加重为首要表现。出现上述症状尤其有吸烟史者应做肺功能检查。",
+    "metadata": {"knowledge_type": "症状", "group": "core", "guideline_year": 2021, "keywords": ["症状", "慢性咳嗽", "咳痰", "呼吸困难"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "吸入支气管扩张剂后FEV1/FVC<0.70可诊断慢阻肺",
+    "content": "慢阻肺的诊断金标准是肺功能检查：吸入支气管扩张剂后，第一秒用力呼气容积与用力肺活量比值（FEV1/FVC）<0.70，可确认存在持续气流受限。结合危险因素暴露史、症状和体征，排除其他疾病后即可诊断。肺功能应在病情稳定期进行。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2021, "keywords": ["诊断", "FEV1/FVC", "0.70", "肺功能"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺按FEV1占预计值百分比分为GOLD1~4级",
+    "content": "根据吸入支气管扩张剂后FEV1占预计值百分比，慢阻肺分为：GOLD1级（轻度）≥80%；GOLD2级（中度）50%~79%；GOLD3级（重度）30%~49%；GOLD4级（极重度）<30%。同时结合症状评分（mMRC、CAT）和过去一年急性加重次数进行综合评估，指导治疗。",
+    "metadata": {"knowledge_type": "诊断", "group": "core", "guideline_year": 2021, "keywords": ["GOLD分级", "FEV1", "mMRC", "CAT"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者呼吸频率>30次/分或SpO2<90%需急诊",
+    "content": "慢阻肺患者出现以下情况提示病情危重，应立即就医：静息状态下血氧饱和度（SpO2）<90%；呼吸频率>30次/分；意识改变（嗜睡、烦躁、昏迷）；口唇发绀；不能平卧；咳大量脓痰或咯血；使用急救药物后症状不缓解。这些可能是急性加重或呼吸衰竭的表现。",
+    "metadata": {"knowledge_type": "危险信号", "group": "red_flag", "guideline_year": 2021, "keywords": ["急性加重", "SpO2", "呼吸频率", "发绀", "急诊"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺稳定期治疗以戒烟、支气管扩张剂和肺康复为核心",
+    "content": "慢阻肺稳定期治疗包括：戒烟；长期规律使用支气管扩张剂（LAMA、LABA或两者联合）以缓解症状、减少急性加重；按指征使用吸入糖皮质激素（ICS）；接种流感疫苗和肺炎球菌疫苗；肺康复训练；长期家庭氧疗（符合指征者）；营养支持。治疗目标是减轻症状、降低急性加重和死亡风险。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2021, "keywords": ["稳定期", "支气管扩张剂", "肺康复", "氧疗"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者应高蛋白、易消化、少食多餐",
+    "content": "慢阻肺患者因呼吸耗能增加，易出现营养不良和体重下降。饮食应保证足够热量和优质蛋白（鱼、蛋、瘦肉、豆制品），多吃蔬菜水果，少食多餐，避免过饱引起腹胀影响呼吸；减少产气食物（如豆类、碳酸饮料）；合并二氧化碳潴留者应避免过多碳水化合物。保持理想体重。",
+    "metadata": {"knowledge_type": "饮食", "group": "core", "guideline_year": 2021, "keywords": ["饮食", "高蛋白", "少食多餐", "营养不良"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者应进行缩唇呼吸和肺康复训练",
+    "content": "肺康复是慢阻肺的重要治疗措施。患者可练习缩唇呼吸（鼻吸气、缩唇缓慢呼气，呼气时间长于吸气）和腹式呼吸；进行步行、踏车、上肢力量训练等，每周3~5次，循序渐进。肺康复可改善呼吸困难、运动耐力和生活质量，减少住院。训练中出现明显气促应休息。",
+    "metadata": {"knowledge_type": "运动", "group": "core", "guideline_year": 2021, "keywords": ["肺康复", "缩唇呼吸", "腹式呼吸", "运动耐力"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺常用吸入药物包括LAMA、LABA和ICS",
+    "content": "慢阻肺稳定期以吸入支气管扩张剂为核心：长效抗胆碱能药（LAMA，如噻托溴铵）、长效β2受体激动剂（LABA，如沙美特罗、福莫特罗）或二者联合。频繁急性加重且血嗜酸粒细胞≥300/μL或既往有哮喘者，可加用吸入糖皮质激素（ICS）。短效支气管扩张剂（沙丁胺醇）用于缓解急性症状。应掌握正确吸入装置用法。",
+    "metadata": {"knowledge_type": "用药原则", "group": "core", "guideline_year": 2021, "keywords": ["LAMA", "LABA", "ICS", "吸入装置"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者应记录症状和峰流速，识别急性加重",
+    "content": "慢阻肺患者可使用CAT评分定期评估症状，记录每日咳嗽、咳痰、气短变化；有条件者监测峰流速和血氧饱和度。急性加重的早期信号包括：气短加重、咳嗽加剧、痰量增多或变脓、需增加急救药物用量。出现上述变化应尽早就医，避免延误。",
+    "metadata": {"knowledge_type": "自我监测", "group": "core", "guideline_year": 2021, "keywords": ["自我监测", "CAT", "峰流速", "急性加重"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者应每3~6个月复查并每年做肺功能",
+    "content": "慢阻肺稳定期患者建议每3~6个月复诊评估症状、吸入装置使用、急性加重次数和用药依从性；每年复查肺功能（FEV1变化）；必要时查血气分析、胸部影像。根据评估结果调整治疗方案。接种疫苗情况也应定期核对。",
+    "metadata": {"knowledge_type": "复查", "group": "core", "guideline_year": 2021, "keywords": ["复查", "肺功能", "血气分析", "疫苗"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺常见误区：不喘就停药、吸氧越多越好",
+    "content": "常见误区包括：症状缓解就自行停用吸入药，导致急性加重；吸入装置使用方法错误，药物未到达肺部；认为吸氧越多越好，慢阻肺伴二氧化碳潴留者高流量吸氧可能加重二氧化碳蓄积，应低流量吸氧；害怕激素副作用而拒绝必要的ICS；继续吸烟。慢阻肺需长期规范管理。",
+    "metadata": {"knowledge_type": "常见误区", "group": "core", "guideline_year": 2021, "keywords": ["误区", "停药", "吸氧", "二氧化碳潴留"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "符合指征的慢阻肺患者应进行长期家庭氧疗",
+    "content": "长期家庭氧疗可改善慢阻肺合并慢性呼吸衰竭患者的生存率。指征包括：PaO2≤55 mmHg或SpO2≤88%；或PaO2 55~60 mmHg伴肺动脉高压、右心衰竭或红细胞增多症。一般每日吸氧≥15小时，采用低流量（1~2 L/min）。具体方案由医生制定，需定期评估。",
+    "metadata": {"knowledge_type": "治疗原则", "group": "core", "guideline_year": 2021, "keywords": ["家庭氧疗", "PaO2", "SpO2", "低流量"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》",
+    "disease": "copd",
+    "title": "慢阻肺患者应接种流感疫苗和肺炎球菌疫苗",
+    "content": "慢阻肺患者是呼吸道感染的高危人群，感染可诱发急性加重。建议每年接种流感疫苗；按当地免疫规划接种肺炎球菌疫苗（如23价多糖疫苗）。接种疫苗可降低呼吸道感染和急性加重风险。具体接种方案可咨询社区医生。",
+    "metadata": {"knowledge_type": "预防", "group": "core", "guideline_year": 2021, "keywords": ["疫苗", "流感疫苗", "肺炎球菌", "急性加重"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "二甲双胍：2型糖尿病一线用药",
+    "content": "通用名二甲双胍，适应证为2型糖尿病，尤其超重肥胖者。常用起始剂量500mg每日2次或850mg每日1次，随餐服用，最大剂量2000mg/日。常见不良反应为胃肠道反应，长期使用可能影响维生素B12吸收。禁忌：eGFR<30 ml/min/1.73m²、严重感染、缺氧、酸中毒；使用含碘造影剂前后需遵医嘱暂停。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["二甲双胍", "一线", "2000mg", "eGFR", "造影剂"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "格列美脲：磺脲类降糖药，注意低血糖",
+    "content": "格列美脲属磺脲类促泌剂，适用于2型糖尿病，起始1~2mg每日1次，早餐前服用，最大6mg/日（部分说明书可达8mg）。主要不良反应为低血糖和体重增加。禁忌：1型糖尿病、糖尿病酮症酸中毒、严重肝肾功能不全。与胰岛素或其他促泌剂联用低血糖风险增加。老年人和肾功能不全者慎用。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["格列美脲", "磺脲类", "低血糖", "促泌剂"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "阿卡波糖：α-糖苷酶抑制剂，随第一口饭嚼服",
+    "content": "阿卡波糖通过延缓碳水化合物吸收降低餐后血糖，常用50mg每日3次，随第一口主食嚼服，最大100mg每日3次。常见不良反应为腹胀、排气增多、腹泻，多可耐受。禁忌：肠梗阻、严重胃肠疾病。单用不引起低血糖，但与其他降糖药联用发生低血糖时应口服葡萄糖（而非蔗糖）。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["阿卡波糖", "α-糖苷酶抑制剂", "餐后血糖", "葡萄糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "西格列汀：DPP-4抑制剂，低血糖风险低",
+    "content": "西格列汀属二肽基肽酶-4（DPP-4）抑制剂，适用于2型糖尿病，常用100mg每日1次。单用低血糖风险低，不增加体重。肾功能不全者需减量（eGFR 30~45减为50mg/日，<30减为25mg/日）。禁忌：1型糖尿病、酮症酸中毒。与磺脲类联用需警惕低血糖。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["西格列汀", "DPP-4", "肾功能", "低血糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "达格列净：SGLT2抑制剂，有心肾保护作用",
+    "content": "达格列净属钠-葡萄糖共转运蛋白2（SGLT2）抑制剂，常用10mg每日1次。除降糖外，对合并心力衰竭、慢性肾病者有心肾保护作用。常见不良反应为泌尿生殖道感染，罕见但严重的不良反应为正常血糖性酮症酸中毒。禁忌：1型糖尿病、eGFR过低（按说明书）、反复泌尿生殖感染。用药期间注意个人卫生、避免脱水。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["达格列净", "SGLT2", "心肾保护", "酮症酸中毒"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "司美格鲁肽：GLP-1受体激动剂，每周一次",
+    "content": "司美格鲁肽属GLP-1受体激动剂，用于2型糖尿病，起始0.25mg每周1次皮下注射，4周后增至0.5mg，最大1.0mg/周（以说明书为准）。常见不良反应为恶心、呕吐、腹泻等胃肠道反应，可减轻体重。禁忌：甲状腺髓样癌病史或MEN2、胰腺炎病史者慎用。具体剂量需人工核对说明书。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["司美格鲁肽", "GLP-1", "每周一次", "甲状腺髓样癌"], "needs_review": true}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "甘精胰岛素：基础胰岛素，每日一次",
+    "content": "甘精胰岛素为长效基础胰岛素，适用于需要胰岛素治疗的糖尿病患者。起始剂量常为0.1~0.2 U/kg/日或10 U每日1次，皮下注射，根据空腹血糖每2~3天调整2~4 U，直至达标。主要不良反应为低血糖和注射部位反应。禁忌：低血糖发作时。需轮换注射部位，未开封制剂冷藏保存。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["甘精胰岛素", "基础胰岛素", "0.1~0.2U/kg", "低血糖"], "needs_review": false}
+  },
+  {
+    "source": "《中国2型糖尿病防治指南（2020年版）》及药品说明书",
+    "disease": "diabetes_type2",
+    "title": "门冬胰岛素：速效胰岛素，餐前注射",
+    "content": "门冬胰岛素为速效胰岛素类似物，用于控制餐后血糖，应在餐前即刻（或餐后立即）皮下注射，剂量根据碳水化合物摄入量和餐前血糖个体化调整。常见不良反应为低血糖。与长效胰岛素联用（基础-餐时方案）时需监测血糖。具体剂量必须由医生制定。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2020, "keywords": ["门冬胰岛素", "速效", "餐前", "基础-餐时"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "氨氯地平：常用CCB类降压药，每日一次",
+    "content": "氨氯地平属二氢吡啶类钙通道阻滞剂（CCB），常用5mg每日1次，最大10mg/日。适用于高血压、慢性稳定型心绞痛。常见不良反应为踝部水肿、面部潮红、头痛、心悸。禁忌：对二氢吡啶类过敏、严重低血压。肝功能不全者起始剂量宜小。与CYP3A4抑制剂合用需谨慎。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["氨氯地平", "CCB", "5mg", "踝部水肿"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "缬沙坦：ARB类降压药，妊娠禁用",
+    "content": "缬沙坦属血管紧张素Ⅱ受体拮抗剂（ARB），常用80mg每日1次，可增至160mg/日。适用于高血压，尤其合并糖尿病肾病、心力衰竭者。禁忌：妊娠、双侧肾动脉狭窄、高钾血症。常见不良反应为头晕、低血压、血钾升高。用药期间应监测肾功能和血钾。与保钾利尿剂、补钾剂合用需谨慎。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["缬沙坦", "ARB", "妊娠禁用", "高钾"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "培哚普利：ACEI类降压药，注意干咳",
+    "content": "培哚普利属血管紧张素转换酶抑制剂（ACEI），常用4mg每日1次，可增至8mg/日。适用于高血压、心力衰竭。常见不良反应为干咳（发生率约10%~20%）、血钾升高、血肌酐升高。禁忌：妊娠、双侧肾动脉狭窄、高钾血症、血管性水肿病史。不能与ARB联用。与保钾利尿剂合用需监测血钾。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["培哚普利", "ACEI", "干咳", "妊娠禁用"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "氢氯噻嗪：噻嗪类利尿剂，注意电解质",
+    "content": "氢氯噻嗪属噻嗪类利尿剂，常用12.5~25mg每日1次。适用于高血压，常与其他降压药联合。常见不良反应为低钾血症、低钠血症、高尿酸血症、血糖和血脂升高。禁忌：严重肾功能不全、痛风急性期、磺胺类过敏。用药期间应监测电解质、尿酸和肾功能。与地高辛合用时低钾增加洋地黄中毒风险。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["氢氯噻嗪", "利尿剂", "低钾", "尿酸"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "美托洛尔：β受体阻滞剂，哮喘患者禁用",
+    "content": "美托洛尔属β受体阻滞剂，缓释片常用47.5mg每日1次，普通片需分次服用。适用于高血压、冠心病、心力衰竭、心律失常。禁忌：支气管哮喘、严重心动过缓、二度及以上房室传导阻滞、严重低血压。常见不良反应为心动过缓、乏力、肢端发冷。不可突然停药，需逐渐减量。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["美托洛尔", "β受体阻滞剂", "哮喘禁用", "心动过缓"], "needs_review": false}
+  },
+  {
+    "source": "《中国高血压防治指南（2024年修订版）》及药品说明书",
+    "disease": "hypertension",
+    "title": "单片复方降压药可提高依从性",
+    "content": "单片复方制剂（如缬沙坦氨氯地平、培哚普利氨氯地平）将两种降压药制成一片，可简化服药方案、提高依从性、减少不良反应。适用于单药控制不佳或需要联合治疗的高血压患者。具体品种和剂量应由医生根据病情选择。服用复方制剂时不应再重复使用其中成分的单药。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2024, "keywords": ["单片复方", "依从性", "联合治疗", "缬沙坦氨氯地平"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》及药品说明书",
+    "disease": "hyperlipidemia",
+    "title": "阿托伐他汀：中等强度他汀，晚间服用",
+    "content": "阿托伐他汀属他汀类调脂药，常用10~20mg每晚1次（中等强度），最大80mg/日。适用于高胆固醇血症和ASCVD防治。主要经CYP3A4代谢，与克拉霉素、伊曲康唑、环孢素、葡萄柚汁等合用可增加肌病风险。用药后4~6周复查血脂、肝酶和CK。禁忌：活动性肝病、妊娠及哺乳期。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2023, "keywords": ["阿托伐他汀", "他汀", "CYP3A4", "肌病"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》及药品说明书",
+    "disease": "hyperlipidemia",
+    "title": "瑞舒伐他汀：强效他汀，肾功能不全需减量",
+    "content": "瑞舒伐他汀属他汀类，常用5~10mg每晚1次（中等强度），最大20mg/日。降LDL-C作用较强。主要经肾脏排泄，严重肾功能不全（eGFR<30）者应减量或禁用。常见不良反应为肌痛、肝酶升高。禁忌：活动性肝病、妊娠及哺乳期。与环孢素、吉非贝齐合用增加肌病风险。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2023, "keywords": ["瑞舒伐他汀", "他汀", "肾功能", "LDL-C"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》及药品说明书",
+    "disease": "hyperlipidemia",
+    "title": "依折麦布：胆固醇吸收抑制剂，常与他汀联用",
+    "content": "依折麦布通过抑制肠道胆固醇吸收降低LDL-C，常用10mg每日1次。可单用或与他汀联合，联合可进一步降低LDL-C约15%~20%。常见不良反应轻微，如头痛、腹泻。禁忌：活动性肝病、妊娠及哺乳期慎用。与他汀联用时仍需监测肝酶和CK。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2023, "keywords": ["依折麦布", "胆固醇吸收抑制剂", "联合他汀", "LDL-C"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》及药品说明书",
+    "disease": "hyperlipidemia",
+    "title": "非诺贝特：贝特类降甘油三酯药",
+    "content": "非诺贝特属贝特类，主要用于高甘油三酯血症，微粒化胶囊常用200mg每日1次，随餐服用。常见不良反应为胃肠道反应、肝酶升高、肌病。与他汀联用会增加肌病风险，应谨慎并在医生指导下使用。禁忌：严重肝肾功能不全、胆囊疾病、妊娠及哺乳期。用药期间监测肝酶和CK。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2023, "keywords": ["非诺贝特", "贝特类", "甘油三酯", "肌病"], "needs_review": false}
+  },
+  {
+    "source": "《中国血脂管理指南（2023年）》及药品说明书",
+    "disease": "hyperlipidemia",
+    "title": "PCSK9抑制剂：强效降LDL-C的注射药物",
+    "content": "PCSK9抑制剂（如依洛尤单抗、阿利西尤单抗）通过抑制PCSK9降低LDL-C约50%~60%，用于他汀治疗后仍不达标的极高危/超高危患者。依洛尤单抗常用140mg每2周1次或420mg每月1次皮下注射。常见不良反应为注射部位反应、鼻咽炎。价格较高，需医生评估后使用。具体剂量以说明书为准。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2023, "keywords": ["PCSK9抑制剂", "依洛尤单抗", "LDL-C", "注射"], "needs_review": true}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》及药品说明书",
+    "disease": "copd",
+    "title": "噻托溴铵：LAMA类吸入药，每日一次",
+    "content": "噻托溴铵属长效抗胆碱能药（LAMA），常用18μg每日1次，通过专用吸入装置（如HandiHaler）吸入。适用于慢阻肺稳定期，可改善症状、减少急性加重。常见不良反应为口干、便秘、排尿困难。禁忌：对阿托品类过敏；窄角型青光眼、前列腺增生伴排尿困难者慎用。使用后应漱口，避免药物入眼。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2021, "keywords": ["噻托溴铵", "LAMA", "18μg", "HandiHaler"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》及药品说明书",
+    "disease": "copd",
+    "title": "沙美特罗/氟替卡松：LABA/ICS联合吸入剂",
+    "content": "沙美特罗/氟替卡松为长效β2受体激动剂与吸入糖皮质激素的复方制剂，常用50/250μg或50/500μg每日2次吸入。适用于慢阻肺频繁急性加重且嗜酸粒细胞升高者。常见不良反应为口咽念珠菌感染、声音嘶哑，吸入后应漱口。禁忌：对成分过敏。不能单独用于急性加重抢救。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2021, "keywords": ["沙美特罗", "氟替卡松", "LABA/ICS", "漱口"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》及药品说明书",
+    "disease": "copd",
+    "title": "布地奈德/福莫特罗：可兼作维持和缓解的吸入剂",
+    "content": "布地奈德/福莫特罗为ICS/LABA复方制剂，常用160/4.5μg每日2次吸入，部分方案可按需加吸。适用于慢阻肺和哮喘。常见不良反应为口咽念珠菌感染、心悸、震颤。吸入后漱口。禁忌：对成分过敏。具体用法（维持或维持加缓解）由医生制定。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2021, "keywords": ["布地奈德", "福莫特罗", "ICS/LABA", "维持缓解"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》及药品说明书",
+    "disease": "copd",
+    "title": "沙丁胺醇：短效支气管扩张剂，用于急救",
+    "content": "沙丁胺醇属短效β2受体激动剂（SABA），常用100~200μg（1~2喷）按需吸入，用于缓解慢阻肺或哮喘急性症状。24小时内使用次数不宜过多（一般不超过8~12喷），若需频繁使用提示病情控制不佳，应及时就医。常见不良反应为心悸、手抖、低钾血症。禁忌：对成分过敏。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2021, "keywords": ["沙丁胺醇", "SABA", "急救", "心悸"], "needs_review": false}
+  },
+  {
+    "source": "《慢性阻塞性肺疾病诊治指南（2021年修订版）》及药品说明书",
+    "disease": "copd",
+    "title": "慢阻肺急性加重可短期使用全身糖皮质激素",
+    "content": "慢阻肺急性加重期，在支气管扩张剂基础上可短期使用全身糖皮质激素，常用泼尼松30~40mg/日，疗程5~7天，可改善肺功能和氧合、缩短恢复时间。长期使用有骨质疏松、血糖升高、感染等风险，不推荐长期口服。具体剂量和疗程由医生决定。",
+    "metadata": {"knowledge_type": "药品", "group": "drug", "guideline_year": 2021, "keywords": ["泼尼松", "急性加重", "全身激素", "5~7天"], "needs_review": false}
+  }
+]

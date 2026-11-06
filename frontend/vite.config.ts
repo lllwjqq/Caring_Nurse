@@ -12,6 +12,8 @@ export default defineConfig({
       '/api': {
         target: apiProxyTarget,
         changeOrigin: true,
+        // 预警 WebSocket 走同一 dev server 代理
+        ws: true,
       },
     },
   },
